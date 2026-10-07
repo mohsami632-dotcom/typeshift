@@ -1,0 +1,51 @@
+name: New Format Request
+description: Request or propose support for a new schema definition format
+title: 'format: Support '
+labels: ['format-adapter', 'ecosystem']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        typeshift is designed to be extensible with new format adapters. Use this template to request a new format!
+
+  - type: input
+    id: format_name
+    attributes:
+      label: Format Name
+      description: What format are you requesting (e.g. OpenAPI 3.1, GraphQL, Protobuf, SQL DDL, Valibot)?
+    validations:
+      required: true
+
+  - type: textarea
+    id: use_cases
+    attributes:
+      label: Target Use Cases
+      description: How would you use this format adapter in your workflow?
+    validations:
+      required: true
+
+  - type: textarea
+    id: sample_schema
+    attributes:
+      label: Example Source Schema
+      description: Provide a typical schema snippet in this format.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: capabilities_overview
+    attributes:
+      label: Known Capability Nuances
+      description: Which features does this format uniquely support or lack?
+      options:
+        - label: Supports runtime validation constraints (min/max/pattern)
+        - label: Supports union/sum types
+        - label: Supports recursive / self-referential schemas
+        - label: Has standardized file extensions (.proto, .graphql, etc.)
+
+  - type: checkboxes
+    id: willing_to_contribute
+    attributes:
+      label: Contribution
+      options:
+        - label: I am interested in helping implement or review this format adapter.

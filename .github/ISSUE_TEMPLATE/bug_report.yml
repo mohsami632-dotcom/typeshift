@@ -1,0 +1,59 @@
+name: Bug Report
+description: Report an issue or unexpected behavior in typeshift
+title: 'fix: '
+labels: ['bug']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting a bug! Please fill out the sections below with as much detail as possible.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear and concise description of what the bug is.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal Reproduction Schema
+      description: Provide the input schema snippet that triggered the issue.
+      render: typescript
+    validations:
+      required: true
+
+  - type: input
+    id: command
+    attributes:
+      label: Command or API Call
+      description: The exact command or code executed (e.g. `typeshift convert input.ts --to zod`)
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What output or behavior did you expect?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: What was the actual output, diagnostics, or error message?
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: Environment Info
+      description: OS version, Node.js version, typeshift version.
+      placeholder: 'Windows 11 / Node 20.11 / typeshift 0.1.0'
+    validations:
+      required: true

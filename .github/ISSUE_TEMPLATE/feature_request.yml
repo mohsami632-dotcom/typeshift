@@ -1,0 +1,38 @@
+name: Feature Request
+description: Suggest an enhancement or new feature for typeshift
+title: 'feat: '
+labels: ['enhancement']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Have an idea for typeshift? We would love to hear it! Please provide details below.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or Pain Point
+      description: Is your feature request related to a specific problem or workflow friction?
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution / DX
+      description: Describe what you would like to happen and how developers would use it (CLI flags, API calls, etc.).
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Any alternative solutions or workarounds you've explored.
+
+  - type: checkboxes
+    id: willing_to_contribute
+    attributes:
+      label: Contribution
+      options:
+        - label: I am willing to submit a pull request for this feature.

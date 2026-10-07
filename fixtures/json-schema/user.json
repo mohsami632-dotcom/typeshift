@@ -1,0 +1,53 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "User",
+  "description": "A user account representation with validation constraints.",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique user identifier",
+      "format": "uuid"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 50
+    },
+    "email": {
+      "type": "string",
+      "format": "email"
+    },
+    "age": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 150
+    },
+    "role": {
+      "type": "string",
+      "enum": ["admin", "user", "guest"],
+      "default": "user"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "address": {
+      "$ref": "#/definitions/Address"
+    }
+  },
+  "required": ["id", "name", "email", "role", "tags"],
+  "definitions": {
+    "Address": {
+      "type": "object",
+      "properties": {
+        "street": { "type": "string" },
+        "city": { "type": "string" },
+        "zipCode": { "type": "string", "pattern": "^[0-9]{5}(-[0-9]{4})?$" }
+      },
+      "required": ["street", "city", "zipCode"]
+    }
+  }
+}
