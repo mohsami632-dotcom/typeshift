@@ -55,14 +55,23 @@ describe('FormatRegistry', () => {
     expect(() => registry.get('missing')).toThrow(UnknownFormatError);
   });
 
-  it('looks up adapter by extension', () => {
+  it('looks up adapter by extension and compound filename', () => {
     const registry = new FormatRegistry();
     const adapter = createDummyAdapter('ext-fmt', ['.foo', '.bar']);
+    const tsAdapter = createDummyAdapter('ts-fmt', ['.ts']);
+    const zodAdapter = createDummyAdapter('zod-fmt', ['.zod.ts']);
+
     registry.register(adapter);
+    registry.register(tsAdapter);
+    registry.register(zodAdapter);
 
     expect(registry.getByExtension('.foo')?.id).toBe('ext-fmt');
     expect(registry.getByExtension('bar')?.id).toBe('ext-fmt');
     expect(registry.getByExtension('.unknown')).toBeUndefined();
+
+    // Compound extension priority check
+    expect(registry.getByExtension('user.zod.ts')?.id).toBe('zod-fmt');
+    expect(registry.getByExtension('user.ts')?.id).toBe('ts-fmt');
   });
 
   it('retrieves all registered adapters', () => {

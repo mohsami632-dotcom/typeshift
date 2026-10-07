@@ -65,4 +65,18 @@ describe('JSON Schema Parser', () => {
     const doc = parseJsonSchema(raw);
     expect(doc.definitions.Root.kind).toBe('union');
   });
+
+  it('throws ParseError on invalid JSON syntax', () => {
+    expect(() => parseJsonSchema('{ not json')).toThrow('Invalid JSON input');
+  });
+
+  it('throws ParseError when JSON root is not an object', () => {
+    expect(() => parseJsonSchema('"just a string"')).toThrow('must be an object');
+    expect(() => parseJsonSchema('[1, 2, 3]')).toThrow('must be an object');
+    expect(() => parseJsonSchema('null')).toThrow('must be an object');
+  });
+
+  it('throws ParseError when no schema definitions are found', () => {
+    expect(() => parseJsonSchema('{}')).toThrow('No schema definitions found');
+  });
 });

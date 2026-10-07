@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "description": "A developer-first, CLI and programmatic schema compiler for bidirectional, loss-aware conversion between schema definition formats.",
   "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "sideEffects": false,
   "exports": {
     ".": {
       "import": {
@@ -52,11 +56,16 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "git+https://github.com/USERNAME/typeshift.git"
   },
+  "bugs": {
+    "url": "https://github.com/USERNAME/typeshift/issues"
+  },
+  "homepage": "https://github.com/USERNAME/typeshift#readme",
   "engines": {
     "node": ">=20.0.0"
   },
+  "packageManager": "pnpm@9.15.4",
   "dependencies": {
     "commander": "^12.1.0",
     "typescript": "^5.5.0"

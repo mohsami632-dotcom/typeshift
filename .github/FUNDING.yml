@@ -1,4 +1,3 @@
-# Community funding platforms
-
-github: typeshift
-open_collective: typeshift
+# Community funding platforms (configure once repository is published)
+# github: [USERNAME]
+# open_collective: [COLLECTIVE]

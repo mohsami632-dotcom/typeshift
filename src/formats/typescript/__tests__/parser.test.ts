@@ -95,4 +95,13 @@ describe('TypeScript Parser', () => {
       expect(user.properties.id.description).toBe('The unique identifier.');
     }
   });
+
+  it('throws ParseError when no interfaces or types are found', () => {
+    const code = `const x = 42; console.log(x);`;
+    expect(() => parseTypeScript(code)).toThrow('No type or interface declarations found');
+  });
+
+  it('throws ParseError on empty input', () => {
+    expect(() => parseTypeScript('')).toThrow('No type or interface declarations found');
+  });
 });

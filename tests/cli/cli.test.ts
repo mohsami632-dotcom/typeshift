@@ -70,4 +70,30 @@ describe('CLI Integration', () => {
     expect(parsed.$schema).toBeDefined();
     expect(parsed.$defs.User).toBeDefined();
   });
+
+  it('exits with code 2 on --loss-policy error when information loss is detected', () => {
+    const fixturePath = path.resolve(__dirname, '../../fixtures/json-schema/user.json');
+    const { code, stderr } = runCli(`convert "${fixturePath}" --to typescript --loss-policy error`, {
+      expectError: true,
+    });
+    expect(code).toBe(2);
+    expect(stderr).toContain('Information loss was detected');
+  });
+
+  it('fails with clear error on unknown format', () => {
+    const fixturePath = path.resolve(__dirname, '../../fixtures/typescript/user.ts');
+    const { code, stderr } = runCli(`convert "${fixturePath}" --to nonexistent-format`, {
+      expectError: true,
+    });
+    expect(code).toBe(1);
+    expect(stderr).toContain('Unknown format: "nonexistent-format"');
+  });
+
+  it('correctly auto-detects .zod.ts compound extension', () => {
+    const fixturePath = path.resolve(__dirname, '../../fixtures/zod/user.ts');
+    // Test validation with explicit format
+    const { stdout, code } = runCli(`validate "${fixturePath}" --format zod`);
+    expect(code).toBe(0);
+    expect(stdout).toContain('zod');
+  });
 });

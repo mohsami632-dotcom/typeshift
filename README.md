@@ -1,6 +1,5 @@
 # typeshift
 
-[![CI](https://github.com/typeshift/typeshift/actions/workflows/ci.yml/badge.svg)](https://github.com/typeshift/typeshift/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.5+-blue.svg)](https://www.typescriptlang.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-%3E%3D20.0.0-green.svg)](https://nodejs.org/)
@@ -28,7 +27,7 @@ Keeping these definitions in sync across layers is often tedious and error-prone
 - **CI-Friendly Operation**: Enforce schema parity with `--loss-policy error` to fail CI if lossy conversions are detected.
 - **Deterministic Output**: Sorted properties and standardized code formatting ensure clean git diffs with zero non-semantic churn.
 - **Extensible Adapter Architecture**: Adding a format requires implementing 2 functions (`parse` and `generate`) rather than $N-1$ converters.
-- **Zero Heavy Runtime Dependencies**: Fast startup with minimal runtime overhead.
+- **Focused Runtime Dependencies**: Direct integration with Commander and the official TypeScript Compiler API without third-party parser bloat.
 
 ---
 

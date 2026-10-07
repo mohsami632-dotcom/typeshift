@@ -53,11 +53,29 @@ export class FormatRegistry {
     return [...this.adapters.values()];
   }
 
-  /** Look up an adapter by file extension (e.g. ".ts"). Returns undefined if none found. */
-  getByExtension(extension: string): FormatAdapter | undefined {
-    const ext = (extension.startsWith('.') ? extension : `.${extension}`).toLowerCase();
+  /**
+   * Look up an adapter by file path or extension (e.g. "schema.zod.ts", ".zod.ts", ".ts").
+   * Checks multi-segment extensions before single extensions.
+   * Returns undefined if none found.
+   */
+  getByExtension(filepathOrExtension: string): FormatAdapter | undefined {
+    const raw = filepathOrExtension.toLowerCase().trim();
+    const target =
+      raw.startsWith('.') || raw.includes('.') || raw.includes('/') || raw.includes('\\')
+        ? raw
+        : `.${raw}`;
+
+    // Sort by extension length descending so ".zod.ts" matches before ".ts"
+    const candidates: { ext: string; adapter: FormatAdapter }[] = [];
     for (const adapter of this.adapters.values()) {
-      if (adapter.extensions.some((e) => e.toLowerCase() === ext)) {
+      for (const ext of adapter.extensions) {
+        candidates.push({ ext: ext.toLowerCase(), adapter });
+      }
+    }
+    candidates.sort((a, b) => b.ext.length - a.ext.length);
+
+    for (const { ext, adapter } of candidates) {
+      if (target === ext || target.endsWith(ext)) {
         return adapter;
       }
     }

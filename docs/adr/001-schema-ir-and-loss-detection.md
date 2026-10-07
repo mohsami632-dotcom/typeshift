@@ -141,7 +141,7 @@ interface ConversionDiagnostic {
 
 The converter guarantees **deterministic output** for the same input: same IR always produces the same output string. This is critical for:
 
-- CI: `typeshift sync-check` can compare outputs to detect drift.
+- CI: `typeshift convert --loss-policy error` can compare outputs to detect drift (with a dedicated `sync-check` command on the v0.3.0 roadmap).
 - Testing: round-trip tests produce predictable results.
 - Code review: generated code doesn't change unless the source schema changed.
 

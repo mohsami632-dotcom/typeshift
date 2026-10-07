@@ -81,8 +81,7 @@ export function registerConvertCommand(program: Command): void {
 
           // Auto-detect source format if not specified
           if (!resolvedFrom) {
-            const ext = path.extname(resolvedFilePath);
-            const adapter = registry.getByExtension(ext);
+            const adapter = registry.getByExtension(resolvedFilePath);
             if (adapter) {
               resolvedFrom = adapter.id;
             }
@@ -105,8 +104,7 @@ export function registerConvertCommand(program: Command): void {
 
         // Auto-detect target format from output path if not specified
         if (!resolvedTo && options.output) {
-          const outExt = path.extname(options.output);
-          const adapter = registry.getByExtension(outExt);
+          const adapter = registry.getByExtension(options.output);
           if (adapter) {
             resolvedTo = adapter.id;
           }

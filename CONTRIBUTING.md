@@ -23,8 +23,8 @@ All contributors and participants are expected to adhere to our [Code of Conduct
 ### Installation
 
 ```bash
-# Clone the repository
-git clone https://github.com/typeshift/typeshift.git
+# Clone the repository (replace with your repository or fork URL)
+git clone https://github.com/<your-username>/typeshift.git
 cd typeshift
 
 # Install dependencies

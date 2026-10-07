@@ -58,4 +58,13 @@ describe('Zod Parser', () => {
     expect(doc.definitions.ListSchema.kind).toBe('array');
     expect(doc.definitions.MapSchema.kind).toBe('record');
   });
+
+  it('throws ParseError when no Zod schemas are found', () => {
+    const code = `const a = 1; function test() {}`;
+    expect(() => parseZod(code)).toThrow('No Zod schema declarations found');
+  });
+
+  it('throws ParseError on empty input', () => {
+    expect(() => parseZod('')).toThrow('No Zod schema declarations found');
+  });
 });

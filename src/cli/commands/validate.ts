@@ -37,8 +37,7 @@ export function registerValidateCommand(program: Command): void {
 
         let formatId = options.format;
         if (!formatId) {
-          const ext = path.extname(resolvedPath);
-          const adapter = registry.getByExtension(ext);
+          const adapter = registry.getByExtension(resolvedPath);
           if (adapter) {
             formatId = adapter.id;
           }
