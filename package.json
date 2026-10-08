@@ -56,12 +56,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/USERNAME/typeshift.git"
+    "url": "git+https://github.com/mohsami632-dotcom/typeshift.git"
   },
   "bugs": {
-    "url": "https://github.com/USERNAME/typeshift/issues"
+    "url": "https://github.com/mohsami632-dotcom/typeshift/issues"
   },
-  "homepage": "https://github.com/USERNAME/typeshift#readme",
+  "homepage": "https://github.com/mohsami632-dotcom/typeshift#readme",
   "engines": {
     "node": ">=20.0.0"
   },

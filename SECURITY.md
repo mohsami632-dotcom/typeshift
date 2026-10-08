@@ -21,8 +21,8 @@ Only the latest minor version receives security updates.
 
 If you discover a vulnerability or potential security risk in typeshift, please report it privately:
 
-1. **GitHub Private Vulnerability Advisory**: Submit a private vulnerability report via the **Security** tab > **Report a vulnerability** on the repository.
-2. **Maintainer Contact**: Contact the repository maintainer directly or at: `[INSERT MAINTAINER SECURITY CONTACT]`.
+1. **GitHub Private Vulnerability Advisory**: Submit a private vulnerability report via [GitHub Security Advisories](https://github.com/mohsami632-dotcom/typeshift/security/advisories/new) under the repository's **Security** tab.
+2. **Maintainer Contact**: If GitHub Private Vulnerability Reporting is unavailable, contact the repository maintainer on GitHub ([@mohsami632-dotcom](https://github.com/mohsami632-dotcom)) or at: `[INSERT MAINTAINER SECURITY EMAIL]`.
 
 ### What to Include in Your Report:
 

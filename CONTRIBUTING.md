@@ -23,9 +23,12 @@ All contributors and participants are expected to adhere to our [Code of Conduct
 ### Installation
 
 ```bash
-# Clone the repository (replace with your repository or fork URL)
-git clone https://github.com/<your-username>/typeshift.git
+# Clone the repository
+git clone https://github.com/mohsami632-dotcom/typeshift.git
 cd typeshift
+
+# Or clone your fork:
+# git clone https://github.com/<your-username>/typeshift.git
 
 # Install dependencies
 pnpm install
@@ -144,11 +147,13 @@ See the complete walkthrough: [docs/adding-a-format.md](docs/adding-a-format.md)
 2. **Add Tests**: Every bug fix or new feature must include corresponding automated tests.
 3. **Run Verification**: Ensure `pnpm run check` passes with 0 errors.
 4. **Write Clear Commit Messages**: We follow conventional commits (e.g. `feat(zod): support z.discriminatedUnion`, `fix(cli): correct --loss-policy error exit code`).
-5. **Submit PR**: Open your pull request against `main`. Provide context on what changed and why.
+5. **Submit PR**: Open your pull request against `main` on [GitHub Pull Requests](https://github.com/mohsami632-dotcom/typeshift/pulls). Provide context on what changed and why.
 
 ---
 
 ## Reporting Issues
+
+Issues are tracked on GitHub at [https://github.com/mohsami632-dotcom/typeshift/issues](https://github.com/mohsami632-dotcom/typeshift/issues).
 
 - **Bug Reports**: Please include the source schema snippet, the command or API call used, the expected output, and the actual output.
 - **Feature Requests**: Describe the problem you are trying to solve and how you envision the solution.

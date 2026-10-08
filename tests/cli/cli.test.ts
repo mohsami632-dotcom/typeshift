@@ -73,9 +73,12 @@ describe('CLI Integration', () => {
 
   it('exits with code 2 on --loss-policy error when information loss is detected', () => {
     const fixturePath = path.resolve(__dirname, '../../fixtures/json-schema/user.json');
-    const { code, stderr } = runCli(`convert "${fixturePath}" --to typescript --loss-policy error`, {
-      expectError: true,
-    });
+    const { code, stderr } = runCli(
+      `convert "${fixturePath}" --to typescript --loss-policy error`,
+      {
+        expectError: true,
+      },
+    );
     expect(code).toBe(2);
     expect(stderr).toContain('Information loss was detected');
   });
