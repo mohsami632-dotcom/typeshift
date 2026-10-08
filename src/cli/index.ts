@@ -8,6 +8,7 @@ import { Command } from 'commander';
 import { registerConvertCommand } from './commands/convert';
 import { registerListCommand } from './commands/list';
 import { registerValidateCommand } from './commands/validate';
+import { getPackageVersion } from './version';
 
 const program = new Command();
 
@@ -16,7 +17,7 @@ program
   .description(
     'Developer-first, CLI and programmatic schema compiler for bidirectional, loss-aware conversion between schema definition formats.',
   )
-  .version('0.1.0')
+  .version(getPackageVersion())
   .option('--debug', 'Print full error stack traces on failure', false);
 
 // Register commands

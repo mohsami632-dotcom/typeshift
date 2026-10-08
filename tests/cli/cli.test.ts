@@ -43,6 +43,15 @@ describe('CLI Integration', () => {
     expect(stdout).toContain('validate');
   });
 
+  it('runs --version and reports the package version', () => {
+    const pkgJson = JSON.parse(
+      fs.readFileSync(path.resolve(__dirname, '../../package.json'), 'utf8'),
+    ) as { version: string };
+    const { stdout, code } = runCli('--version');
+    expect(code).toBe(0);
+    expect(stdout.trim()).toBe(pkgJson.version);
+  });
+
   it('runs list command with detailed view and json', () => {
     const { stdout } = runCli('list --detailed');
     expect(stdout).toContain('Available Schema Formats:');

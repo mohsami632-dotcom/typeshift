@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.3] - 2026-10-08
+
+### Fixed
+- Fixed CLI `--version` reporting hardcoded `0.1.0`; the CLI now dynamically derives its version from package metadata at compile time and runtime.
+
 ## [0.1.2] - 2026-10-08
 
 ### Changed
