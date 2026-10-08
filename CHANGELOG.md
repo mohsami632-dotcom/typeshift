@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.1] - 2026-10-08
+
+### Changed
+- Migrated npm package scope to `@mohsami/typeshift`.
+- Configured npm Trusted Publishing via GitHub Actions OIDC with build provenance.
+- Corrected CI and Release workflow step ordering for clean builds before integration tests.
+
 ## [0.1.0] - 2026-10-07
 
 ### Added

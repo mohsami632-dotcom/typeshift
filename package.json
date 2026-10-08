@@ -1,7 +1,10 @@
 {
-  "name": "typeshift",
-  "version": "0.1.0",
+  "name": "@mohsami/typeshift",
+  "version": "0.1.1",
   "description": "A developer-first, CLI and programmatic schema compiler for bidirectional, loss-aware conversion between schema definition formats.",
+  "publishConfig": {
+    "access": "public"
+  },
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",

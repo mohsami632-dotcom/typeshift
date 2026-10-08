@@ -17,7 +17,7 @@ import {
   type ConversionResult,
   type ConversionDiagnostic,
   type FormatAdapter,
-} from 'typeshift';
+} from '@mohsami/typeshift';
 ```
 
 ---
@@ -60,7 +60,7 @@ interface ConversionResult {
 #### Example:
 
 ```typescript
-import { convert } from 'typeshift';
+import { convert } from '@mohsami/typeshift';
 
 const result = convert(
   `
@@ -128,7 +128,7 @@ function detectLoss(
 The `S` namespace provides builders for constructing and manipulating SchemaIR trees programmatically:
 
 ```typescript
-import { S } from 'typeshift';
+import { S } from '@mohsami/typeshift';
 
 const doc = S.document(
   {
@@ -178,7 +178,7 @@ const doc = S.document(
 You can construct an isolated registry or register custom format adapters:
 
 ```typescript
-import { FormatRegistry, type FormatAdapter } from 'typeshift';
+import { FormatRegistry, type FormatAdapter } from '@mohsami/typeshift';
 
 const customRegistry = new FormatRegistry();
 

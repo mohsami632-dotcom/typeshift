@@ -38,19 +38,26 @@ Keeping these definitions in sync across layers is often tedious and error-prone
 
 ```bash
 # Using pnpm
-pnpm add -g typeshift
+pnpm add -g @mohsami/typeshift
 
 # Using npm
-npm install -g typeshift
+npm install -g @mohsami/typeshift
 
 # Using yarn
-yarn global add typeshift
+yarn global add @mohsami/typeshift
+
+# Or run directly without installation
+npx @mohsami/typeshift --help
 ```
 
 ### Local Project Dependency
 
 ```bash
-pnpm add typeshift
+# Using pnpm
+pnpm add @mohsami/typeshift
+
+# Using npm
+npm install @mohsami/typeshift
 ```
 
 ---
@@ -145,7 +152,7 @@ typeshift validate src/types/user.ts
 typeshift is fully typed and exports a comprehensive programmatic API.
 
 ```typescript
-import { convert, parse, generate, detectLoss, S } from 'typeshift';
+import { convert, parse, generate, detectLoss, S } from '@mohsami/typeshift';
 
 // High-level conversion
 const result = convert(
@@ -169,7 +176,7 @@ console.log(result.diagnostics);
 ### Constructing Schemas Manually (IR Builders)
 
 ```typescript
-import { S, generate } from 'typeshift';
+import { S, generate } from '@mohsami/typeshift';
 
 const document = S.document({
   User: S.object({

@@ -108,7 +108,7 @@ export function getDefaultRegistry(): FormatRegistry {
  *
  * @example
  * ```ts
- * import { convert } from 'typeshift';
+ * import { convert } from '@mohsami/typeshift';
  *
  * const result = convert(
  *   'export interface User { id: string; name: string; age?: number; }',
