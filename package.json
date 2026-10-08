@@ -23,7 +23,7 @@
     }
   },
   "bin": {
-    "typeshift": "./dist/cli.js"
+    "typeshift": "dist/cli.js"
   },
   "files": [
     "dist",
