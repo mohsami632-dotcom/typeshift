@@ -158,3 +158,17 @@ Issues are tracked on GitHub at [https://github.com/mohsami632-dotcom/typeshift/
 
 - **Bug Reports**: Please include the source schema snippet, the command or API call used, the expected output, and the actual output.
 - **Feature Requests**: Describe the problem you are trying to solve and how you envision the solution.
+
+---
+
+## Release Process (Maintainers)
+
+Releases are automated through GitHub Actions upon pushing a semver git tag (`v*`):
+
+1. **npm Trusted Publishing (OIDC)**: No manual `NPM_TOKEN` secret is required. The release workflow authenticates directly to npm via OpenID Connect (OIDC) ID tokens and attaches signed build provenance attestations.
+2. **Automated Pipeline**: Pushing a version tag (`vX.Y.Z`) triggers [.github/workflows/release.yml](.github/workflows/release.yml), which:
+   - Runs type checks and linting (`pnpm run typecheck`, `pnpm run lint`)
+   - Builds distribution bundles (`pnpm run build`)
+   - Executes the full test suite (`pnpm run test`)
+   - Publishes to npm using `npm publish --access public --provenance`
+   - Creates a GitHub Release with release notes and bundle assets
