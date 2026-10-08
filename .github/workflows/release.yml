@@ -27,11 +27,17 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Verify checks
-        run: pnpm run check
+      - name: Type check
+        run: pnpm run typecheck
+
+      - name: Lint
+        run: pnpm run lint
 
       - name: Build dist
         run: pnpm run build
+
+      - name: Run test suite
+        run: pnpm run test
 
       - name: Publish to npm
         run: pnpm publish --no-git-checks --access public

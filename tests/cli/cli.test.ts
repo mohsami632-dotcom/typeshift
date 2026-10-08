@@ -1,6 +1,7 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeAll } from 'vitest';
 import { execSync } from 'node:child_process';
 import * as path from 'node:path';
+import * as fs from 'node:fs';
 
 const cliPath = path.resolve(__dirname, '../../dist/cli.js');
 
@@ -25,6 +26,13 @@ function runCli(args: string, options?: { expectError?: boolean }) {
 }
 
 describe('CLI Integration', () => {
+  beforeAll(() => {
+    if (!fs.existsSync(cliPath)) {
+      throw new Error(
+        `CLI build artifact not found at "${cliPath}". Please run "pnpm run build" before running CLI integration tests.`,
+      );
+    }
+  });
   it('runs --help with exit code 0', () => {
     const { stdout, code } = runCli('--help');
     expect(code).toBe(0);

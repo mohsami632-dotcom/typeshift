@@ -52,6 +52,7 @@ pnpm test
 | `pnpm run build`         | Compiles the library (ESM + CJS + DTS) and CLI binary with `tsup`  |
 | `pnpm run dev`           | Runs `tsup` in watch mode for active development                   |
 | `pnpm test`              | Runs the test suite via `vitest`                                   |
+| `pnpm run test:unit`     | Runs unit and integration tests without requiring built artifacts  |
 | `pnpm run test:watch`    | Runs vitest in interactive watch mode                              |
 | `pnpm run test:coverage` | Generates a test coverage report using V8                          |
 | `pnpm run lint`          | Runs `eslint` across all source and test files                     |
@@ -59,7 +60,7 @@ pnpm test
 | `pnpm run format`        | Formats all code with Prettier                                     |
 | `pnpm run format:check`  | Checks formatting without modifying files                          |
 | `pnpm run typecheck`     | Validates TypeScript types across the codebase with `tsc --noEmit` |
-| `pnpm run check`         | Runs full pre-commit pipeline: typecheck + lint + test             |
+| `pnpm run check`         | Runs full pre-commit pipeline: typecheck + lint + build + test     |
 
 ---
 
