@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.2] - 2026-10-08
+
+### Changed
+- Configured and enabled GitHub Actions npm Trusted Publishing via OIDC.
+- First automated release published through the GitHub Actions Trusted Publishing pipeline.
+
 ## [0.1.1] - 2026-10-08
 
 ### Changed
