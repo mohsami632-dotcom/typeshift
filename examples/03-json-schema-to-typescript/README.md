@@ -31,9 +31,8 @@ Information-Loss Diagnostics (7 warnings):
 ## What This Demonstrates
 
 1. **Why Information-Loss Diagnostics Matter**:
-   - TypeScript is a compile-time type system; it cannot natively enforce `pattern`, `minimum: 18`, or `minLength: 8` at runtime.
-   - Most one-way converters drop these invariants silently, leaving developers unaware that validation rules disappeared.
-   - `typeshift` generates valid, usable TypeScript interfaces while explicitly logging each dropped invariant with its precise dot-path.
+   - When converting between rich schema formats and static types, dropped constraints can easily go unnoticed without dedicated diagnostics.
+   - `typeshift` generates valid, usable TypeScript interfaces while explicitly logging each unrepresented constraint with its precise dot-path.
 2. **Deterministic Output**:
    - Properties are sorted alphabetically (`accountNumber`, `age`, `email`, `isVerified`, `password`).
    - Descriptions from JSON Schema are converted into standard JSDoc comments.

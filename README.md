@@ -36,17 +36,17 @@ Modern systems inevitably maintain schemas across multiple boundaries:
 - **Zod schemas** for runtime request/response parsing and form validation.
 - **OpenAPI 3.1 specifications** for public REST APIs and client generation.
 
-When schemas drift across layers, bugs slip into production. Point-to-point tools (such as `json-schema-to-typescript`, `ts-to-zod`, or `zod-to-json-schema`) solve individual one-way transformations, but they operate in isolation:
-1. **Silent Constraint Loss**: Point tools frequently drop regex patterns, numeric ranges, formats, or descriptions without warning.
-2. **Exponential Complexity ($N \times (N-1)$)**: Supporting 4 formats requires 12 separate converters; supporting 6 formats requires 30.
-3. **No CI Parity Verification**: There is no uniform way to assert in CI that generated schemas match their source models.
+When schemas drift across layers, bugs slip into production. Translating schemas across diverse format boundaries introduces several core challenges:
+1. **Mismatched Format Expressiveness**: Different schema formats have fundamentally different capabilities. For example, a JSON Schema with numeric bounds or regex patterns cannot fully express those validation constraints in standard compile-time TypeScript interfaces. Without explicit visibility, developers may assume target schemas carry the same guarantees as source schemas.
+2. **Combinatorial Complexity ($N \times (N-1)$)**: Supporting 4 formats with point-to-point tools requires managing 12 separate pairs; supporting 6 requires 30.
+3. **CI Parity Verification**: Multi-tool workflows often lack a uniform mechanism to enforce schema fidelity and detect unrepresentable changes across layers.
 
 **typeshift solves this with a compiler model:**
 - **Canonical Intermediate Representation (SchemaIR)**: All formats parse into and generate from a unified AST ($2N$ scaling). Adding a format requires only 2 functions (`parse` and `generate`).
 - **Explicit Information-Loss Diagnostics**: Every conversion inspects source constraints against target format capabilities. If information cannot be expressed natively, typeshift reports exact paths and dropped constraints.
 - **CI Enforcement**: `--loss-policy error` immediately fails automated pipelines (exit code `2`) if unauthorized loss occurs.
 - **Deterministic Generation**: Alphabetically sorted keys and normalized layout guarantee character-identical output and zero git diff churn.
-- **Zero Third-Party Parser Bloat**: Direct integration with the official TypeScript Compiler API and Node.js runtime.
+- **Robust Parser Architecture**: Direct integration with the official TypeScript Compiler API for AST parsing, paired with Commander for CLI execution and a lightweight core transformation engine.
 
 ---
 

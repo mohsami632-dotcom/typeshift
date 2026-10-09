@@ -11,14 +11,14 @@ This document contains ready-to-use launch materials, demonstration scripts, cop
 **typeshift** is an open-source, developer-first schema compiler for bidirectional, loss-aware conversion between schema definition formats: TypeScript, JSON Schema, Zod, and OpenAPI 3.1.
 
 ### The Problem It Solves
-Modern web and backend systems maintain schemas across multiple layers (TypeScript compile-time interfaces, JSON Schema API contracts, Zod runtime validators, and OpenAPI specifications). Existing point-to-point converters operate one-way, scale quadratically ($N \times (N-1)$), and silently drop validation rules (regex patterns, numeric ranges, formats) without warning.
+Modern web and backend systems maintain schemas across multiple layers (TypeScript compile-time interfaces, JSON Schema API contracts, Zod runtime validators, and OpenAPI specifications). Managing multiple point-to-point converters scales quadratically ($N \times (N-1)$), and converting between formats with fundamentally mismatched expressiveness (such as runtime validation bounds vs. static types) can easily cause validation constraints to be lost unnoticed.
 
 ### Why typeshift is Different
 - **Canonical Compiler Model ($2N$)**: All formats parse into and generate from a shared Intermediate Representation (SchemaIR).
 - **Explicit Information-Loss Diagnostics**: Inspects source constraints against target capabilities and surfaces exact dot-paths of dropped rules.
 - **CI Quality Enforcement**: `--loss-policy error` immediately fails automated pipelines (exit code `2`) if unauthorized loss occurs.
 - **Deterministic Output**: Sorted properties and standardized formatting guarantee clean git diffs with zero non-semantic churn.
-- **Zero Third-Party Parser Bloat**: Native integration with the official TypeScript Compiler API and Node.js runtime.
+- **Focused Dependency Design**: Integrates directly with the official TypeScript Compiler API for AST parsing and Commander for the CLI, keeping core compilation self-contained.
 
 ---
 
@@ -118,15 +118,15 @@ Like many teams, we maintain data contracts across multiple boundaries:
 - Zod schemas for runtime request validation.
 - OpenAPI 3.1 specifications for public API consumers.
 
-Keeping these definitions in sync by hand is painful. But when using one-off point converters (`ts-to-zod`, `json-schema-to-typescript`, etc.), we noticed a common issue: validation invariants (regex patterns, numeric bounds, format validators) are often dropped silently without warning.
+Keeping these definitions in sync by hand is tedious. Furthermore, converting schemas across format boundaries often faces feature mismatches: static TypeScript interfaces, for instance, cannot natively enforce runtime regex patterns or numeric boundaries that exist in JSON Schema or Zod. Without explicit visibility, it is easy for developers to lose track of which constraints are preserved.
 
 To solve this, we built **typeshift** (https://github.com/mohsami632-dotcom/typeshift):
 
 1. **A Compiler Architecture ($2N$ Scaling)**: Instead of writing $N \times (N-1)$ converters, all formats parse into and generate from a shared Intermediate Representation (SchemaIR). Adding an adapter requires writing only 2 functions: `parse()` and `generate()`.
-2. **Explicit Loss Diagnostics**: When converting a rich JSON Schema into compile-time TypeScript, typeshift tells you exactly which constraints are lost (e.g. `[User.age] Constraint "minimum" (value: 18) dropped`).
-3. **CI Quality Gates**: Running with `--loss-policy error` aborts conversion and exits with code 2 if constraints are dropped, preventing silent schema drift in CI.
+2. **Explicit Loss Diagnostics**: When converting a richer schema (e.g. JSON Schema with runtime bounds) into compile-time TypeScript, typeshift explicitly highlights constraints that cannot be natively represented in the target format (e.g. `[User.age] Constraint "minimum" (value: 18) dropped`).
+3. **CI Quality Gates**: Running with `--loss-policy error` aborts conversion and exits with code 2 if constraints are dropped, preventing unintended schema divergence in CI.
 4. **Deterministic Generation**: Normalized indentation and alphabetically sorted keys ensure clean, predictable git diffs.
-5. **No Parser Bloat**: Direct integration with the official TypeScript Compiler API and Node.js runtime.
+5. **Focused Dependencies**: Integrates directly with the official TypeScript Compiler API for robust type analysis and Commander for the CLI, keeping core compilation self-contained.
 
 You can try it directly without installing anything:
 ```bash
