@@ -288,7 +288,7 @@ typeshift validate openapi.json --json
 > **OpenAPI 3.1 Scope & Boundaries**:
 > - **In Scope**: Data models declared under `components.schemas` (object definitions, scalar constraints, enums, unions, intersections, references via `#/components/schemas/<Name>`, and `readOnly` attributes).
 > - **Not in Scope**: HTTP API routing operations under `paths` (endpoints, HTTP methods, headers, route parameters). `typeshift` is a schema model compiler, not a full client/server code generator.
-> - **File Formats**: OpenAPI specifications must be provided in JSON format (`.openapi.json`, `.oas.json`, `openapi.json`, or `.json`). Direct YAML (`.yaml`/`.yml`) parsing is not yet supported natively; providing a YAML file gives clear, actionable instructions. Tracking issue: [#1](https://github.com/mohsami632-dotcom/typeshift/issues/1).
+> - **File Formats**: OpenAPI specifications must be provided in JSON format (`.openapi.json`, `.oas.json`, `openapi.json`, or `.json`). Direct YAML (`.yaml`/`.yml`) parsing is not yet supported natively; providing a YAML file gives clear, actionable instructions. Tracking issue: [#5](https://github.com/mohsami632-dotcom/typeshift/issues/5).
 
 ---
 
@@ -396,8 +396,8 @@ We welcome community contributions! Because each format adapter is an isolated m
 
 - [x] **v0.1.0** — Core SchemaIR, TypeScript, JSON Schema, and Zod adapters, loss detection, CLI.
 - [x] **v0.2.0** — OpenAPI 3.1 component schemas adapter, comprehensive test matrix, format aliases, loss-policy exit codes.
-- [ ] **v0.3.0** — GraphQL Schema Definition Language (SDL) adapter, file watch mode (`--watch`).
-- [ ] **v0.4.0** — SQL DDL adapter (PostgreSQL / SQLite create table schemas), configuration file support (`typeshift.config.ts`).
+- [ ] **v0.3.0** — GraphQL SDL adapter ([#1](https://github.com/mohsami632-dotcom/typeshift/issues/1)), OpenAPI YAML input ([#5](https://github.com/mohsami632-dotcom/typeshift/issues/5)), file watch mode ([#3](https://github.com/mohsami632-dotcom/typeshift/issues/3)).
+- [ ] **v0.4.0** — SQL DDL adapter ([#2](https://github.com/mohsami632-dotcom/typeshift/issues/2)), expanded JSON Schema keywords ([#4](https://github.com/mohsami632-dotcom/typeshift/issues/4)), configuration file support (`typeshift.config.ts`).
 - [ ] **v1.0.0** — Protobuf message adapter, external plugin loading from npm, performance benchmarks for multi-megabyte schemas.
 
 ---

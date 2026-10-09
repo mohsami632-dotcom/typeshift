@@ -182,6 +182,6 @@ We'd love your feedback on the architecture, developer experience, and which ada
 - Link the demo video in the README.
 
 ### Phase 4: Days 24–30 (Contributor Community Activation)
-- Promote the 4 curated issues ([#1 GraphQL](https://github.com/mohsami632-dotcom/typeshift/issues/1), [#2 SQL DDL](https://github.com/mohsami632-dotcom/typeshift/issues/2), [#3 Watch Mode](https://github.com/mohsami632-dotcom/typeshift/issues/3), [#4 Keywords](https://github.com/mohsami632-dotcom/typeshift/issues/4)) on community Discord/Slack channels (e.g. TypeScript Community Discord).
+- Promote the 5 curated roadmap issues ([#1 GraphQL](https://github.com/mohsami632-dotcom/typeshift/issues/1), [#2 SQL DDL](https://github.com/mohsami632-dotcom/typeshift/issues/2), [#3 Watch Mode](https://github.com/mohsami632-dotcom/typeshift/issues/3), [#4 Keywords](https://github.com/mohsami632-dotcom/typeshift/issues/4), [#5 OpenAPI YAML](https://github.com/mohsami632-dotcom/typeshift/issues/5)) on community Discord/Slack channels (e.g. TypeScript Community Discord).
 - Pair with first external contributors on pull requests.
 - Plan the `v0.3.0` feature scope based on community usage feedback.

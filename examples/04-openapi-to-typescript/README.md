@@ -28,4 +28,4 @@ npx @mohsami/typeshift convert petstore.openapi.json --to typescript -o petstore
 
 - **Supported**: Data contracts declared under `components.schemas`, including primitive types, objects, arrays, `$ref` links, `readOnly` attributes, enums, `oneOf`, `anyOf`, and `allOf`.
 - **Not in Scope**: HTTP API routing operations under `paths` (endpoints, HTTP methods, headers, query parameters). `typeshift` is a schema model compiler, not a full client/server generator.
-- **Format Requirement**: OpenAPI documents must be provided in JSON format (`.json` or `.openapi.json`). Native YAML parsing is tracked on the roadmap.
+- **Format Requirement**: OpenAPI documents must be provided in JSON format (`.json` or `.openapi.json`). Native YAML parsing is tracked on the roadmap ([#5](https://github.com/mohsami632-dotcom/typeshift/issues/5)).
