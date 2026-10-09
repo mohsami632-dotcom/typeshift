@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Account",
+  "description": "User account registration contract",
+  "type": "object",
+  "properties": {
+    "accountNumber": {
+      "type": "string",
+      "pattern": "^[A-Z]{3}-[0-9]{4}$"
+    },
+    "email": {
+      "type": "string",
+      "format": "email"
+    },
+    "age": {
+      "type": "integer",
+      "minimum": 18,
+      "maximum": 120
+    },
+    "password": {
+      "type": "string",
+      "minLength": 8,
+      "maxLength": 64
+    },
+    "isVerified": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": ["accountNumber", "email", "age", "password"]
+}

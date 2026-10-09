@@ -92,6 +92,7 @@ typeshift/
 │   ├── cli/                   # CLI end-to-end integration tests
 │   └── integration/           # Cross-format conversion & roundtrip tests
 ├── fixtures/                  # Real-world schema fixtures for testing
+├── examples/                  # Verified end-to-end examples with README explanations
 └── docs/                      # Architectural decisions and guides
 ```
 

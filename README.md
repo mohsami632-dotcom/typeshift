@@ -50,20 +50,46 @@ When schemas drift across layers, bugs slip into production. Point-to-point tool
 
 ---
 
-## Quick Start
+## Quick Start: Try It in 30 Seconds
 
-Run instantly with `npx` without installing:
+### Option A: Instant Shell Pipe (Zero Files Required)
+
+Convert a TypeScript interface directly to JSON Schema without creating any files:
 
 ```bash
-# Convert TypeScript interfaces to JSON Schema
-npx @mohsami/typeshift convert schema.ts --to json-schema -o schema.json
-
-# Convert OpenAPI 3.1 models to TypeScript interfaces
-npx @mohsami/typeshift convert openapi.json --to typescript -o models.ts
-
-# Convert JSON Schema to runtime Zod validators
-npx @mohsami/typeshift convert schema.json --to zod -o schema.zod.ts
+# On Linux, macOS, or PowerShell:
+echo 'export interface User { id: string; name: string; age?: number; }' | npx @mohsami/typeshift convert --from ts --to json-schema
 ```
+
+### Option B: Local File Conversion
+
+**1. Create a minimal sample schema (`user.ts`):**
+
+```typescript
+// user.ts
+export interface User {
+  id: string;
+  name: string;
+  age?: number;
+  role: 'admin' | 'member';
+}
+```
+
+**2. Compile to a Draft-07 JSON Schema:**
+
+```bash
+npx @mohsami/typeshift convert user.ts --to json-schema -o user.schema.json
+```
+
+**3. Compile to a runtime Zod validator:**
+
+```bash
+npx @mohsami/typeshift convert user.ts --to zod -o user.zod.ts
+```
+
+**4. Explore complete committed examples:**
+
+Explore the [`examples/`](./examples) directory for tested sample files covering TypeScript, JSON Schema, Zod, OpenAPI 3.1, and CI quality gates.
 
 ---
 
@@ -258,7 +284,11 @@ typeshift validate openapi.json --json
 | **Component References (`$ref`)** | ✅ | ✅ | ✅ | ✅ |
 | **ReadOnly Property Attributes** | ✅ | ❌ _(warned)_ | ❌ _(warned)_ | ✅ |
 
-> **Note on OpenAPI 3.1**: OpenAPI 3.1 schemas are fully aligned with JSON Schema Draft 2020-12. typeshift extracts and generates component schemas under `components.schemas` and cross-references them via `#/components/schemas/<Name>`. OpenAPI specifications currently must be provided in JSON format (`openapi.json` / `.openapi.json`). Native YAML parsing is tracked on the project roadmap.
+> [!IMPORTANT]
+> **OpenAPI 3.1 Scope & Boundaries**:
+> - **In Scope**: Data models declared under `components.schemas` (object definitions, scalar constraints, enums, unions, intersections, references via `#/components/schemas/<Name>`, and `readOnly` attributes).
+> - **Not in Scope**: HTTP API routing operations under `paths` (endpoints, HTTP methods, headers, route parameters). `typeshift` is a schema model compiler, not a full client/server code generator.
+> - **File Formats**: OpenAPI specifications must be provided in JSON format (`.openapi.json`, `.oas.json`, `openapi.json`, or `.json`). Direct YAML (`.yaml`/`.yml`) parsing is not yet supported natively; providing a YAML file gives clear, actionable instructions. Tracking issue: [#1](https://github.com/mohsami632-dotcom/typeshift/issues/1).
 
 ---
 
@@ -343,11 +373,11 @@ For complete API details, refer to the [API Reference](docs/api.md).
        Diagnostics                  Target Output
 ```
 
-Read our comprehensive [Architecture Guide](docs/architecture.md) for deep-dive explanations of:
-- The canonical SchemaIR type system.
-- The `FormatAdapter` interface and registry lifecycle.
-- Capability declarations and the loss detection engine.
-- Deterministic code generation standards.
+Read our comprehensive documentation:
+- [Examples Directory](examples/README.md) — 5 runnable, committed examples with inputs, outputs, and explanations.
+- [Architecture Guide](docs/architecture.md) — Deep dive into SchemaIR, the $2N$ compiler model, and capability declarations.
+- [API Reference](docs/api.md) — Full TypeScript programmatic API guide and builders.
+- [Launch Kit & Adoption Playbook](docs/launch-kit.md) — Demo scripts, copy-paste snippets, and community guide.
 
 ---
 
