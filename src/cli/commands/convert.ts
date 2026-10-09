@@ -86,10 +86,29 @@ export function registerConvertCommand(program: Command): void {
               resolvedFrom = adapter.id;
             }
           }
+
+          // If detected as json-schema (or generic json), check if it's an OpenAPI 3 document
+          if ((!resolvedFrom || resolvedFrom === 'json-schema') && inputText.includes('"openapi"')) {
+            try {
+              const parsed = JSON.parse(inputText) as Record<string, unknown>;
+              if (typeof parsed?.openapi === 'string' && (parsed.openapi.startsWith('3.') || parsed.openapi.startsWith('3.1'))) {
+                resolvedFrom = 'openapi';
+              }
+            } catch {
+              // Ignore and let standard parser handle syntax error
+            }
+          }
         }
 
         // 2. Validate --from
         if (!resolvedFrom) {
+          if (inputPath && (inputPath.endsWith('.yaml') || inputPath.endsWith('.yml'))) {
+            console.error(
+              `${symbols.error} ${colors.red('YAML format (.yaml/.yml) is not yet supported natively.')} Please convert to JSON (e.g. openapi.json).`,
+            );
+            process.exit(1);
+          }
+
           console.error(
             `${symbols.error} ${colors.red('Could not determine source format.')} Please specify with ${colors.bold('--from <format>')}.`,
           );

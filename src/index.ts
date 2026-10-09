@@ -23,6 +23,7 @@ import {
   typescriptAdapter,
   jsonSchemaAdapter,
   zodAdapter,
+  openApiAdapter,
 } from './formats';
 
 // Re-export all core types
@@ -78,6 +79,7 @@ export {
   typescriptAdapter,
   jsonSchemaAdapter,
   zodAdapter,
+  openApiAdapter,
 };
 
 // Re-export loss detector

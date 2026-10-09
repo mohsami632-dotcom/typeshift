@@ -1,0 +1,136 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "E-Commerce Checkout API",
+    "description": "Schemas for orders, payments, and discounts in OpenAPI 3.1",
+    "version": "2.4.0"
+  },
+  "paths": {},
+  "components": {
+    "schemas": {
+      "Address": {
+        "type": "object",
+        "description": "Physical postal address",
+        "properties": {
+          "street": {
+            "type": "string",
+            "minLength": 5
+          },
+          "city": {
+            "type": "string"
+          },
+          "postalCode": {
+            "type": "string",
+            "pattern": "^[0-9]{5}(-[0-9]{4})?$"
+          },
+          "country": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 2
+          }
+        },
+        "required": ["street", "city", "postalCode", "country"]
+      },
+      "Customer": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "readOnly": true
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "shippingAddress": {
+            "$ref": "#/components/schemas/Address"
+          },
+          "notes": {
+            "type": ["string", "null"]
+          }
+        },
+        "required": ["id", "email", "shippingAddress"]
+      },
+      "CreditCardPayment": {
+        "type": "object",
+        "properties": {
+          "method": {
+            "const": "credit_card"
+          },
+          "lastFour": {
+            "type": "string",
+            "minLength": 4,
+            "maxLength": 4
+          }
+        },
+        "required": ["method", "lastFour"]
+      },
+      "PayPalPayment": {
+        "type": "object",
+        "properties": {
+          "method": {
+            "const": "paypal"
+          },
+          "payerEmail": {
+            "type": "string",
+            "format": "email"
+          }
+        },
+        "required": ["method", "payerEmail"]
+      },
+      "Payment": {
+        "oneOf": [
+          { "$ref": "#/components/schemas/CreditCardPayment" },
+          { "$ref": "#/components/schemas/PayPalPayment" }
+        ]
+      },
+      "OrderItem": {
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "unitPrice": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "required": ["productId", "quantity", "unitPrice"]
+      },
+      "Order": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "readOnly": true
+          },
+          "customer": {
+            "$ref": "#/components/schemas/Customer"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderItem"
+            },
+            "minItems": 1
+          },
+          "payment": {
+            "$ref": "#/components/schemas/Payment"
+          },
+          "customMetadata": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["id", "customer", "items", "payment"]
+      }
+    }
+  }
+}

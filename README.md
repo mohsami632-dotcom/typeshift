@@ -1,34 +1,69 @@
 # typeshift
 
 [![CI](https://github.com/mohsami632-dotcom/typeshift/actions/workflows/ci.yml/badge.svg)](https://github.com/mohsami632-dotcom/typeshift/actions/workflows/ci.yml)
+[![npm version](https://img.shields.io/npm/v/@mohsami/typeshift.svg)](https://www.npmjs.com/package/@mohsami/typeshift)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.5+-blue.svg)](https://www.typescriptlang.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-%3E%3D20.0.0-green.svg)](https://nodejs.org/)
 
-> **typeshift is a developer-first, CLI and programmatic schema compiler for bidirectional, loss-aware conversion between schema definition formats.**
+**typeshift is a developer-first schema compiler for bidirectional, loss-aware conversion between schema definition formats.**
+
+```
+               ┌───────────────────────┐
+               │    TypeScript (.ts)   │
+               └───────────▲───────────┘
+                           │
+       ┌───────────────────┼───────────────────┐
+       │                   ▼                   │
+┌──────┴──────┐      ┌───────────┐      ┌──────┴──────┐
+│ JSON Schema │ <──> │  SchemaIR │ <──> │ Zod (.zod)  │
+└──────┬──────┘      └───────────┘      └──────┬──────┘
+       │                   ▲                   │
+       └───────────────────┼───────────────────┘
+                           │
+               ┌───────────▼───────────┐
+               │   OpenAPI 3.1 (.json) │
+               └───────────────────────┘
+```
 
 ---
 
-## The Problem
+## Why typeshift?
 
-Modern web and backend applications maintain schemas across multiple boundaries:
+Modern systems inevitably maintain schemas across multiple boundaries:
+- **TypeScript interfaces** for application logic and compile-time types.
+- **JSON Schema** for event streams, storage validation, and API contracts.
+- **Zod schemas** for runtime request/response parsing and form validation.
+- **OpenAPI 3.1 specifications** for public REST APIs and client generation.
 
-- **TypeScript interfaces** for application logic and compile-time type checking.
-- **JSON Schema** for API contracts, event streams, and OpenAPI specifications.
-- **Zod schemas** for runtime request/response parsing and input validation.
+When schemas drift across layers, bugs slip into production. Point-to-point tools (such as `json-schema-to-typescript`, `ts-to-zod`, or `zod-to-json-schema`) solve individual one-way transformations, but they operate in isolation:
+1. **Silent Constraint Loss**: Point tools frequently drop regex patterns, numeric ranges, formats, or descriptions without warning.
+2. **Exponential Complexity ($N \times (N-1)$)**: Supporting 4 formats requires 12 separate converters; supporting 6 formats requires 30.
+3. **No CI Parity Verification**: There is no uniform way to assert in CI that generated schemas match their source models.
 
-Keeping these definitions in sync across layers is often tedious and error-prone. Point tools exist for specific pairs (e.g., `json-schema-to-typescript`, `ts-to-zod`, `zod-to-json-schema`), but they frequently drop constraints silently (such as regex patterns, numeric ranges, or format validators) and do not provide a unified, CI-friendly workflow.
+**typeshift solves this with a compiler model:**
+- **Canonical Intermediate Representation (SchemaIR)**: All formats parse into and generate from a unified AST ($2N$ scaling). Adding a format requires only 2 functions (`parse` and `generate`).
+- **Explicit Information-Loss Diagnostics**: Every conversion inspects source constraints against target format capabilities. If information cannot be expressed natively, typeshift reports exact paths and dropped constraints.
+- **CI Enforcement**: `--loss-policy error` immediately fails automated pipelines (exit code `2`) if unauthorized loss occurs.
+- **Deterministic Generation**: Alphabetically sorted keys and normalized layout guarantee character-identical output and zero git diff churn.
+- **Zero Third-Party Parser Bloat**: Direct integration with the official TypeScript Compiler API and Node.js runtime.
 
-## Key Differentiators
+---
 
-- **CLI-First Developer Workflow**: Fast conversion directly in your terminal or shell pipelines (`stdin`/`stdout`).
-- **Programmatic API**: First-class Node.js/TypeScript API for build tools, code generators, and custom automation.
-- **Bidirectional Conversion**: Convert between formats in both directions through a canonical intermediate representation (IR).
-- **Explicit Information-Loss Detection**: Never wonder whether a constraint was dropped. typeshift inspects source constraints against target format capabilities and emits structured diagnostics.
-- **CI-Friendly Operation**: Enforce schema parity with `--loss-policy error` to fail CI if lossy conversions are detected.
-- **Deterministic Output**: Sorted properties and standardized code formatting ensure clean git diffs with zero non-semantic churn.
-- **Extensible Adapter Architecture**: Adding a format requires implementing 2 functions (`parse` and `generate`) rather than $N-1$ converters.
-- **Focused Runtime Dependencies**: Direct integration with Commander and the official TypeScript Compiler API without third-party parser bloat.
+## Quick Start
+
+Run instantly with `npx` without installing:
+
+```bash
+# Convert TypeScript interfaces to JSON Schema
+npx @mohsami/typeshift convert schema.ts --to json-schema -o schema.json
+
+# Convert OpenAPI 3.1 models to TypeScript interfaces
+npx @mohsami/typeshift convert openapi.json --to typescript -o models.ts
+
+# Convert JSON Schema to runtime Zod validators
+npx @mohsami/typeshift convert schema.json --to zod -o schema.zod.ts
+```
 
 ---
 
@@ -45,86 +80,136 @@ npm install -g @mohsami/typeshift
 
 # Using yarn
 yarn global add @mohsami/typeshift
-
-# Or run directly without installation
-npx @mohsami/typeshift --help
 ```
 
 ### Local Project Dependency
 
 ```bash
-# Using pnpm
 pnpm add @mohsami/typeshift
-
-# Using npm
+# or
 npm install @mohsami/typeshift
 ```
 
 ---
 
-## CLI Usage
+## Visual Example: Loss Detection & CI Enforcement
 
-### 1. Basic Conversion
+When converting rich schemas into formats with weaker constraint semantics (e.g., JSON Schema to compile-time TypeScript), typeshift alerts you to dropped invariants:
 
 ```bash
-# Convert TypeScript interface to JSON Schema
-typeshift convert src/types/user.ts --to json-schema -o schemas/user.json
-
-# Convert JSON Schema to Zod
-typeshift convert schemas/user.json --to zod -o src/schemas/user.zod.ts
-
-# Convert Zod to TypeScript interface
-typeshift convert src/schemas/user.zod.ts --to typescript -o src/types/user.ts
+$ typeshift convert schemas/user.json --to typescript
 ```
 
-### 2. Format Aliases & Auto-Detection
-
-Source format is automatically inferred from file extension (`.ts`, `.json`, `.zod.ts`), or can be specified with short aliases (`ts`, `jsonschema`, `z`):
-
-```bash
-typeshift convert schema.ts --to zod
-typeshift convert schema.json --from jsonschema --to ts
-```
-
-### 3. Piping & Shell Composability
-
-```bash
-cat user.ts | typeshift convert --from ts --to json-schema
-```
-
-### 4. Loss Policies & CI Integration
-
-When converting a schema with rich constraints (such as `minimum: 0`, `pattern: "..."`, or `format: "email"`) to a format that cannot enforce them at compile-time (like TypeScript interfaces), typeshift detects the loss:
-
-```bash
-$ typeshift convert schema.json --to typescript
-
+```text
 Information-Loss Diagnostics (3 warnings):
   ▲ WARNING [User.email] Constraint "format" (value: "email") will be dropped. (format constraint)
   ▲ WARNING [User.age] Constraint "minimum" (value: 0) will be dropped. (minimum constraint)
   ▲ WARNING [User.age] Constraint "maximum" (value: 120) will be dropped. (maximum constraint)
 
 // Generated by typeshift — do not edit manually.
+
 export interface User {
   email: string;
-  age: number;
+  age?: number;
 }
 ```
 
-In CI pipelines, enforce zero unintended information loss:
+### Enforcing Strict Loss Policy in CI
+
+To ensure schema parity across teams and prevent accidental degradation:
 
 ```bash
-# Exits with status code 2 if warnings/errors are detected
-typeshift convert schema.json --to typescript --loss-policy error
+# Aborts conversion and exits with code 2 if any constraint is dropped
+typeshift convert schemas/user.json --to typescript --loss-policy error
 ```
 
-### 5. Inspect Supported Formats & Capabilities
+```text
+Information-Loss Diagnostics (3 warnings):
+  ▲ WARNING [User.email] Constraint "format" (value: "email") will be dropped.
+  ▲ WARNING [User.age] Constraint "minimum" (value: 0) will be dropped.
+  ▲ WARNING [User.age] Constraint "maximum" (value: 120) will be dropped.
+✖ Aborting due to --loss-policy error. Information loss was detected during conversion.
+```
+
+---
+
+## CI Workflow Example
+
+Add schema verification to your GitHub Actions pipeline:
+
+```yaml
+name: Verify Schema Parity
+on: [push, pull_request]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Verify zero schema drift
+        run: |
+          npx @mohsami/typeshift convert contracts/api.openapi.json --to json-schema --loss-policy error -o dist/api.schema.json
+          git diff --exit-code dist/api.schema.json
+```
+
+---
+
+## CLI Usage Guide
+
+### 1. File Conversion
+
+```bash
+# TypeScript -> JSON Schema
+typeshift convert src/models.ts --to json-schema -o schemas/models.json
+
+# OpenAPI 3.1 -> TypeScript
+typeshift convert openapi.json --to typescript -o src/api-types.ts
+
+# OpenAPI 3.1 -> Zod
+typeshift convert openapi.json --to zod -o src/validators.zod.ts
+
+# JSON Schema -> OpenAPI 3.1
+typeshift convert schema.json --to openapi -o spec.openapi.json
+```
+
+### 2. Format Aliases & Auto-Detection
+
+Source format is automatically inferred from file extension (`.ts`, `.json`, `.openapi.json`, `.zod.ts`), or can be specified with short aliases:
+
+| Format | Format ID | Aliases | File Extensions |
+| :--- | :--- | :--- | :--- |
+| **TypeScript** | `typescript` | `ts` | `.ts` |
+| **JSON Schema** | `json-schema` | `jsonschema`, `json` | `.json`, `.schema.json` |
+| **Zod** | `zod` | `z` | `.zod.ts` |
+| **OpenAPI 3.1** | `openapi` | `oas`, `oas3`, `openapi3.1` | `.openapi.json`, `.oas.json`, `openapi.json` |
+
+```bash
+typeshift convert schema.ts --to z
+typeshift convert openapi.json --to ts
+```
+
+### 3. Shell Piping (`stdin` / `stdout`)
+
+```bash
+cat types.ts | typeshift convert --from ts --to json-schema
+```
+
+### 4. Inspect Available Formats & Capabilities
 
 ```bash
 typeshift list --detailed
 ```
-
-Output:
 
 ```text
 Available Schema Formats:
@@ -137,77 +222,99 @@ Available Schema Formats:
 
   zod              Zod              Extensions: .zod.ts (Aliases: z)
     Capabilities: +constraints +docs +defaults +nullable +unions +intersections -recursion
+
+  openapi          OpenAPI 3.1      Extensions: .openapi.json, .oas.json, openapi.json, .openapi (Aliases: oas, oas3, openapi3, openapi-3.1, openapi3.1)
+    Capabilities: +constraints +docs +defaults +nullable +unions +intersections +recursion
 ```
 
-### 6. Validate Schemas
+### 5. Validate Schemas
 
 ```bash
-typeshift validate src/types/user.ts
-```
+# Human-readable summary
+typeshift validate openapi.json
 
----
-
-## Programmatic API
-
-typeshift is fully typed and exports a comprehensive programmatic API.
-
-```typescript
-import { convert, parse, generate, detectLoss, S } from '@mohsami/typeshift';
-
-// High-level conversion
-const result = convert(
-  `
-  export interface User {
-    id: string;
-    username: string;
-    age?: number;
-  }
-  `,
-  {
-    from: 'typescript',
-    to: 'json-schema',
-  },
-);
-
-console.log(result.output);
-console.log(result.diagnostics);
-```
-
-### Constructing Schemas Manually (IR Builders)
-
-```typescript
-import { S, generate } from '@mohsami/typeshift';
-
-const document = S.document({
-  User: S.object({
-    id: S.prop(S.string({ format: 'uuid' })),
-    name: S.prop(S.string({ minLength: 2, maxLength: 50 })),
-    age: S.optProp(S.integer({ minimum: 0 })),
-  }),
-});
-
-// Generate Zod code from IR
-const zodCode = generate(document, 'zod');
-console.log(zodCode);
+# Structured JSON output for scripts
+typeshift validate openapi.json --json
 ```
 
 ---
 
 ## Supported Formats Matrix
 
-| Feature                                         | TypeScript (`ts`) | JSON Schema (`json-schema`) | Zod (`zod`) |
-| ----------------------------------------------- | :---------------: | :-------------------------: | :---------: |
-| **Bidirectional**                               |        ✅         |             ✅              |     ✅      |
-| **Object / Interfaces**                         |        ✅         |             ✅              |     ✅      |
-| **Numeric Constraints** (`min`, `max`)          |   ❌ _(warned)_   |             ✅              |     ✅      |
-| **String Constraints** (`pattern`, `minLength`) |   ❌ _(warned)_   |             ✅              |     ✅      |
-| **Format Validators** (`email`, `uuid`, etc.)   |   ❌ _(warned)_   |             ✅              |     ✅      |
-| **Default Values**                              |   ❌ _(warned)_   |             ✅              |     ✅      |
-| **Unions & Discriminated Unions**               |        ✅         |             ✅              |     ✅      |
-| **Intersections**                               |        ✅         |             ✅              |     ✅      |
-| **Enums & Literals**                            |        ✅         |             ✅              |     ✅      |
-| **Tuples & Records**                            |        ✅         |             ✅              |     ✅      |
-| **Documentation / JSDoc / Descriptions**        |        ✅         |             ✅              |     ✅      |
+| Feature | TypeScript (`ts`) | JSON Schema (`json-schema`) | Zod (`zod`) | OpenAPI 3.1 (`openapi`) |
+| :--- | :---: | :---: | :---: | :---: |
+| **Bidirectional** | ✅ | ✅ | ✅ | ✅ |
+| **Object / Interfaces** | ✅ | ✅ | ✅ | ✅ |
+| **Numeric Constraints** (`min`, `max`, `multipleOf`) | ❌ _(warned)_ | ✅ | ✅ | ✅ |
+| **String Constraints** (`pattern`, `minLength`, `maxLength`) | ❌ _(warned)_ | ✅ | ✅ | ✅ |
+| **Format Hints** (`email`, `uuid`, `uri`, `date-time`) | ❌ _(warned)_ | ✅ | ✅ | ✅ |
+| **Default Values** | ❌ _(warned)_ | ✅ | ✅ | ✅ |
+| **Unions & Discriminated Unions** | ✅ | ✅ | ✅ | ✅ |
+| **Intersections** | ✅ | ✅ | ✅ | ✅ |
+| **Enums & Literals** | ✅ | ✅ | ✅ | ✅ |
+| **Tuples & Records** | ✅ | ✅ | ✅ | ✅ |
+| **Nullable & Optional Modifiers** | ✅ | ✅ | ✅ | ✅ |
+| **Documentation / JSDoc / Descriptions** | ✅ | ✅ | ✅ | ✅ |
+| **Component References (`$ref`)** | ✅ | ✅ | ✅ | ✅ |
+| **ReadOnly Property Attributes** | ✅ | ❌ _(warned)_ | ❌ _(warned)_ | ✅ |
+
+> **Note on OpenAPI 3.1**: OpenAPI 3.1 schemas are fully aligned with JSON Schema Draft 2020-12. typeshift extracts and generates component schemas under `components.schemas` and cross-references them via `#/components/schemas/<Name>`. OpenAPI specifications currently must be provided in JSON format (`openapi.json` / `.openapi.json`). Native YAML parsing is tracked on the project roadmap.
+
+---
+
+## Programmatic API
+
+typeshift is fully typed and exports a TypeScript programmatic API.
+
+```typescript
+import { convert, parse, generate, S } from '@mohsami/typeshift';
+
+// High-level bidirectional conversion
+const result = convert(
+  `
+  export interface User {
+    id: string;
+    username: string;
+    email: string;
+    role?: 'admin' | 'member';
+  }
+  `,
+  {
+    from: 'typescript',
+    to: 'openapi',
+  },
+);
+
+console.log(result.output);
+// Emits valid OpenAPI 3.1.0 document with components.schemas.User
+
+console.log(result.diagnostics);
+// Emits diagnostics array if information loss was detected
+```
+
+### Building Schemas Manually (Fluent SchemaIR)
+
+```typescript
+import { S, generate } from '@mohsami/typeshift';
+
+const doc = S.document({
+  Product: S.object({
+    sku: S.required(S.string({ minLength: 3 })),
+    price: S.required(S.number({ minimum: 0 })),
+    tags: S.optional(S.array(S.string())),
+  }),
+});
+
+// Generate Zod code from IR
+const zodCode = generate(doc, 'zod');
+console.log(zodCode);
+
+// Generate OpenAPI 3.1 from IR
+const openApiDoc = generate(doc, 'openapi');
+console.log(openApiDoc);
+```
+
+For complete API details, refer to the [API Reference](docs/api.md).
 
 ---
 
@@ -236,31 +343,32 @@ console.log(zodCode);
        Diagnostics                  Target Output
 ```
 
-Instead of requiring $N \times (N - 1)$ individual conversion combinations, typeshift normalizes all schemas into a unified **Schema Intermediate Representation (SchemaIR)**:
-
-- Adding format $N$ requires implementing only **2 functions** (`parse` and `generate`).
-- The internal SchemaIR captures rich semantics: types, constraints, descriptions, nullability, optionality, records, tuples, unions, and references.
-- For complete architecture details, read the [Architecture Guide](docs/architecture.md).
+Read our comprehensive [Architecture Guide](docs/architecture.md) for deep-dive explanations of:
+- The canonical SchemaIR type system.
+- The `FormatAdapter` interface and registry lifecycle.
+- Capability declarations and the loss detection engine.
+- Deterministic code generation standards.
 
 ---
 
 ## Contributing
 
-We welcome community contributions! Because each format adapter is an isolated module, adding support for new formats (such as OpenAPI, GraphQL, SQL DDL, or Protobuf) is clear and independent.
+We welcome community contributions! Because each format adapter is an isolated module, adding support for new formats (such as GraphQL, SQL DDL, or Protobuf) is clean, approachable, and self-contained.
 
-- Read our [Contributing Guide](CONTRIBUTING.md) to set up your development environment.
-- Follow the step-by-step tutorial: [Adding a Format Adapter](docs/adding-a-format.md).
+- Read our [Contributing Guide](CONTRIBUTING.md) to set up your environment.
+- Follow the tutorial: [Adding a New Format Adapter](docs/adding-a-format.md).
+- Browse [Good First Issues](https://github.com/mohsami632-dotcom/typeshift/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) and [Help Wanted Tasks](https://github.com/mohsami632-dotcom/typeshift/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22).
 - Read our [Code of Conduct](CODE_OF_CONDUCT.md).
-- Report bugs or request features via our [GitHub Issue Tracker](https://github.com/mohsami632-dotcom/typeshift/issues).
 
 ---
 
 ## Roadmap
 
-- [x] **v0.1.0** — Core SchemaIR, TypeScript, JSON Schema, and Zod bidirectional adapters, loss detection, CLI.
-- [ ] **v0.2.0** — OpenAPI 3.1 component schemas adapter, watch mode (`--watch`), config file support (`typeshift.config.ts`).
-- [ ] **v0.3.0** — External plugin loader from npm, GraphQL types adapter, SQL DDL adapter.
-- [ ] **v1.0.0** — Protobuf message adapter, VS Code extension, performance benchmarks for multi-megabyte schemas.
+- [x] **v0.1.0** — Core SchemaIR, TypeScript, JSON Schema, and Zod adapters, loss detection, CLI.
+- [x] **v0.2.0** — OpenAPI 3.1 component schemas adapter, comprehensive test matrix, format aliases, loss-policy exit codes.
+- [ ] **v0.3.0** — GraphQL Schema Definition Language (SDL) adapter, file watch mode (`--watch`).
+- [ ] **v0.4.0** — SQL DDL adapter (PostgreSQL / SQLite create table schemas), configuration file support (`typeshift.config.ts`).
+- [ ] **v1.0.0** — Protobuf message adapter, external plugin loading from npm, performance benchmarks for multi-megabyte schemas.
 
 ---
 

@@ -325,7 +325,10 @@ function extractNullableUnion(
   const schemas: SchemaNode[] = [];
 
   for (const member of node.types) {
-    if (member.kind === ts.SyntaxKind.NullKeyword) {
+    if (
+      member.kind === ts.SyntaxKind.NullKeyword ||
+      (ts.isLiteralTypeNode(member) && member.literal.kind === ts.SyntaxKind.NullKeyword)
+    ) {
       nullable = true;
     } else if (member.kind === ts.SyntaxKind.UndefinedKeyword) {
       // undefined in union treated as optional concern, not nullable
@@ -342,6 +345,9 @@ function extractNullableUnion(
 function parseLiteral(node: ts.LiteralTypeNode): SchemaNode {
   const literal = node.literal;
 
+  if (literal.kind === ts.SyntaxKind.NullKeyword) {
+    return { kind: 'null' };
+  }
   if (ts.isStringLiteral(literal)) {
     return { kind: 'literal', value: literal.text };
   }

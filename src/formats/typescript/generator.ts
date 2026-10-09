@@ -82,7 +82,7 @@ function generateBaseType(node: SchemaNode): string {
       return String(node.value);
 
     case 'array':
-      return `${wrapIfCompound(generateType(node.items), node.items)}[]`;
+      return `${wrapIfArrayItem(generateType(node.items), node.items)}[]`;
 
     case 'tuple':
       return `[${node.items.map((i) => generateType(i)).join(', ')}]`;
@@ -157,12 +157,17 @@ function formatJSDoc(description: string): string {
   return ['/**', ...lines.map((l) => ` * ${l}`), ' */'].join('\n');
 }
 
-/** Wrap type in parens if it's a compound type (union/intersection) used in array context. */
+/** Wrap type in parens if it's a compound type (union/intersection). */
 function wrapIfCompound(typeStr: string, node: SchemaNode): string {
   if (node.kind === 'union' || node.kind === 'intersection' || node.kind === 'enum') {
     return `(${typeStr})`;
   }
-  if (node.nullable) {
+  return typeStr;
+}
+
+/** Wrap type in parens if it's a compound type or nullable used in array context (e.g. (string | null)[]). */
+function wrapIfArrayItem(typeStr: string, node: SchemaNode): string {
+  if (node.kind === 'union' || node.kind === 'intersection' || node.kind === 'enum' || node.nullable) {
     return `(${typeStr})`;
   }
   return typeStr;

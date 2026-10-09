@@ -116,4 +116,80 @@ describe('CLI Integration', () => {
     expect(code).toBe(0);
     expect(stdout).toContain('zod');
   });
+
+  it('runs validate --json and outputs structured json', () => {
+    const fixturePath = path.resolve(__dirname, '../../fixtures/typescript/user.ts');
+    const { stdout, code } = runCli(`validate "${fixturePath}" --json`);
+    expect(code).toBe(0);
+    const parsed = JSON.parse(stdout);
+    expect(parsed.valid).toBe(true);
+    expect(parsed.format).toBe('typescript');
+    expect(parsed.definitionsCount).toBeGreaterThanOrEqual(1);
+  });
+
+  it('supports format aliases (ts, jsonschema, z)', () => {
+    const fixturePath = path.resolve(__dirname, '../../fixtures/typescript/user.ts');
+    const { stdout, code } = runCli(`convert "${fixturePath}" --from ts --to jsonschema`);
+    expect(code).toBe(0);
+    expect(stdout).toContain('http://json-schema.org/draft-07/schema#');
+
+    const zodRes = runCli(`convert "${fixturePath}" --to z`);
+    expect(zodRes.code).toBe(0);
+    expect(zodRes.stdout).toContain("import { z } from 'zod';");
+  });
+
+  it('fails gracefully on malformed JSON file', () => {
+    const tmpBadJson = path.resolve(__dirname, '../../tmp-bad.json');
+    fs.writeFileSync(tmpBadJson, '{ invalid json: [', 'utf8');
+    try {
+      const { code, stderr } = runCli(`convert "${tmpBadJson}" --to typescript`, {
+        expectError: true,
+      });
+      expect(code).toBe(1);
+      expect(stderr).toContain('Invalid JSON input');
+    } finally {
+      if (fs.existsSync(tmpBadJson)) fs.unlinkSync(tmpBadJson);
+    }
+  });
+
+  it('fails convert on missing input file with clean exit code 1', () => {
+    const { code, stderr } = runCli('convert non-existent-schema.json --to typescript', {
+      expectError: true,
+    });
+    expect(code).toBe(1);
+    expect(stderr).toContain('Input file not found');
+  });
+
+  it('converts OpenAPI 3.1 file to TypeScript via CLI with auto-detection', () => {
+    const openapiPath = path.resolve(__dirname, '../../fixtures/openapi/petstore.openapi.json');
+    const { stdout, code } = runCli(`convert "${openapiPath}" --to typescript`);
+    expect(code).toBe(0);
+    expect(stdout).toContain('export interface Pet');
+    expect(stdout).toContain('export interface Category');
+  });
+
+  it('validates OpenAPI 3.1 file via CLI', () => {
+    const openapiPath = path.resolve(__dirname, '../../fixtures/openapi/petstore.openapi.json');
+    const { stdout, code } = runCli(`validate "${openapiPath}" --json`);
+    expect(code).toBe(0);
+    const parsed = JSON.parse(stdout);
+    expect(parsed.valid).toBe(true);
+    expect(parsed.format).toBe('openapi');
+    expect(parsed.definitionsCount).toBeGreaterThanOrEqual(2);
+  });
+
+  it('gives clear guidance when given a YAML file', () => {
+    const tmpYaml = path.resolve(__dirname, '../../test-temp.yaml');
+    fs.writeFileSync(tmpYaml, 'openapi: 3.1.0\ninfo:\n  title: Test', 'utf8');
+    try {
+      const { code, stderr } = runCli(`convert "${tmpYaml}" --to typescript`, {
+        expectError: true,
+      });
+      expect(code).toBe(1);
+      expect(stderr).toContain('YAML format (.yaml/.yml) is not yet supported');
+    } finally {
+      if (fs.existsSync(tmpYaml)) fs.unlinkSync(tmpYaml);
+    }
+  });
 });
+

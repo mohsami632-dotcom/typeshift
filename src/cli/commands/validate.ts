@@ -43,14 +43,33 @@ export function registerValidateCommand(program: Command): void {
           }
         }
 
+        const input = fs.readFileSync(resolvedPath, 'utf8');
+
+        // Sniff for OpenAPI document if detected as generic json
+        if ((!formatId || formatId === 'json-schema') && input.includes('"openapi"')) {
+          try {
+            const parsed = JSON.parse(input) as Record<string, unknown>;
+            if (typeof parsed?.openapi === 'string' && (parsed.openapi.startsWith('3.') || parsed.openapi.startsWith('3.1'))) {
+              formatId = 'openapi';
+            }
+          } catch {
+            // Let parse handle error
+          }
+        }
+
         if (!formatId) {
+          if (filePath.endsWith('.yaml') || filePath.endsWith('.yml')) {
+            console.error(
+              `${symbols.error} ${colors.red('YAML format (.yaml/.yml) is not yet supported natively.')} Please convert to JSON (e.g. openapi.json).`,
+            );
+            process.exit(1);
+          }
+
           console.error(
             `${symbols.error} ${colors.red('Could not determine schema format.')} Please specify with ${colors.bold('--format <format>')}.`,
           );
           process.exit(1);
         }
-
-        const input = fs.readFileSync(resolvedPath, 'utf8');
         const document = parse(input, formatId, registry, { filename: filePath });
 
         const definitionCount = Object.keys(document.definitions).length;

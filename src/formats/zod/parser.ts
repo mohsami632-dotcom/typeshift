@@ -78,6 +78,15 @@ export function parseZodExpression(expr: ts.Expression, sf: ts.SourceFile): Sche
     current = current.expression.expression;
   }
 
+  // If the target is not 'z', it may be a reference to another schema identifier (e.g. `UserSchema` or `Priority`)
+  if (ts.isIdentifier(current) && current.text !== 'z') {
+    let schema: SchemaNode = { kind: 'ref', ref: current.text };
+    for (const mod of chain) {
+      schema = applyModifier(schema, mod.method, mod.args, sf);
+    }
+    return schema;
+  }
+
   // The innermost should be the `z` identifier
   if (!ts.isIdentifier(current) || current.text !== 'z') {
     return null;
@@ -115,6 +124,19 @@ function parseZodPropertyExpression(
       args: [...current.arguments],
     });
     current = current.expression.expression;
+  }
+
+  // Check if referencing another schema identifier (e.g. `priority: Priority` or `address: AddressSchema.optional()`)
+  if (ts.isIdentifier(current) && current.text !== 'z') {
+    let schema: SchemaNode = { kind: 'ref', ref: current.text };
+    const isOptional = chain.some((c) => c.method === 'optional');
+
+    for (const mod of chain) {
+      if (mod.method === 'optional') continue;
+      schema = applyModifier(schema, mod.method, mod.args, sf);
+    }
+
+    return { schema, optional: isOptional };
   }
 
   if (!ts.isIdentifier(current) || current.text !== 'z') return null;

@@ -10,13 +10,20 @@ import { FormatRegistry } from '../core/registry';
 import { typescriptAdapter } from './typescript';
 import { jsonSchemaAdapter } from './json-schema';
 import { zodAdapter } from './zod';
+import { openApiAdapter } from './openapi';
 
 export { typescriptAdapter, parseTypeScript, generateTypeScript } from './typescript';
 export { jsonSchemaAdapter, parseJsonSchema, generateJsonSchema } from './json-schema';
 export { zodAdapter, parseZod, generateZod } from './zod';
+export { openApiAdapter, parseOpenApi, generateOpenApi } from './openapi';
 
 /** Array of all built-in format adapters. */
-export const builtinAdapters = [typescriptAdapter, jsonSchemaAdapter, zodAdapter] as const;
+export const builtinAdapters = [
+  typescriptAdapter,
+  jsonSchemaAdapter,
+  zodAdapter,
+  openApiAdapter,
+] as const;
 
 /**
  * Register all built-in adapters with the given registry.

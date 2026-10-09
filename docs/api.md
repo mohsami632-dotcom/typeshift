@@ -12,6 +12,10 @@ import {
   getDefaultRegistry,
   FormatRegistry,
   S,
+  typescriptAdapter,
+  jsonSchemaAdapter,
+  zodAdapter,
+  openApiAdapter,
   type ConvertOptions,
   type SchemaDocument,
   type ConversionResult,
@@ -38,9 +42,9 @@ function convert(
 
 #### Parameters:
 
-- `input`: The raw source code of the schema (e.g. TypeScript interfaces, JSON Schema JSON, or Zod schema declarations).
+- `input`: The raw source code of the schema (e.g. TypeScript interfaces, JSON Schema JSON, OpenAPI specification, or Zod schema declarations).
 - `options`:
-  - `from: string`: Source format identifier or alias (e.g. `'typescript'`, `'ts'`, `'json-schema'`, `'zod'`).
+  - `from: string`: Source format identifier or alias (e.g. `'typescript'`, `'ts'`, `'json-schema'`, `'zod'`, `'openapi'`, `'oas'`).
   - `to: string`: Target format identifier or alias.
   - `parseOptions?: { filename?: string }`: Optional parse configuration.
   - `generateOptions?: { header?: boolean }`: Optional generator configuration (e.g., whether to include banner header comments).
@@ -72,7 +76,7 @@ const result = convert(
   `,
   {
     from: 'typescript',
-    to: 'json-schema',
+    to: 'openapi',
   },
 );
 
@@ -123,16 +127,38 @@ function detectLoss(
 
 ---
 
+## Built-In Adapters & Direct Exports
+
+typeshift exports its built-in adapters and direct parser/generator helpers:
+
+```typescript
+import {
+  typescriptAdapter,
+  parseTypeScript,
+  generateTypeScript,
+  jsonSchemaAdapter,
+  parseJsonSchema,
+  generateJsonSchema,
+  zodAdapter,
+  parseZod,
+  generateZod,
+  openApiAdapter,
+  parseOpenApi,
+  generateOpenApi,
+} from '@mohsami/typeshift';
+```
+
+---
+
 ## Schema Builders (`S`)
 
-The `S` namespace provides builders for constructing and manipulating SchemaIR trees programmatically:
+The `S` namespace provides fluent builders for constructing and manipulating SchemaIR trees programmatically:
 
 ```typescript
 import { S } from '@mohsami/typeshift';
 
 const doc = S.document(
   {
-    // Definitions
     User: S.object({
       id: S.prop(S.string({ format: 'uuid' })),
       name: S.prop(S.string({ minLength: 2, maxLength: 50 })),

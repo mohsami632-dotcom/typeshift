@@ -85,6 +85,7 @@ typeshift/
 │   │   ├── typescript/        # TypeScript parser and generator
 │   │   ├── json-schema/       # JSON Schema parser and generator
 │   │   ├── zod/               # Zod parser and generator
+│   │   ├── openapi/           # OpenAPI 3.1 parser and generator
 │   │   └── index.ts           # Built-in adapter registration
 │   └── index.ts               # Public programmatic API entry point
 ├── tests/

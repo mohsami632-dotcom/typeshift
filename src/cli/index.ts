@@ -31,11 +31,12 @@ program.addHelpText(
   `
 Examples:
   $ typeshift convert schema.ts --to json-schema -o schema.json
+  $ typeshift convert openapi.json --to typescript -o models.ts
   $ typeshift convert schema.json --to zod -o schema.zod.ts
   $ typeshift convert schema.zod.ts --to ts -o schema.ts
   $ typeshift convert schema.ts --to json-schema --loss-policy error
   $ cat types.ts | typeshift convert --from ts --to zod
-  $ typeshift validate schema.ts
+  $ typeshift validate openapi.json
   $ typeshift list --detailed
 `,
 );

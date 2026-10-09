@@ -7,6 +7,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.0] - 2026-10-09
+
+### Added
+- **OpenAPI 3.1 Format Adapter (`openapi`)**:
+  - Full bidirectional support for OpenAPI 3.1 specifications aligned with JSON Schema Draft 2020-12.
+  - Component schema parsing and generation under `components.schemas`.
+  - JSON pointer reference resolution using `#/components/schemas/<Name>`.
+  - Full support for `readOnly` attributes, nullable type arrays (`["string", "null"]`), and legacy OpenAPI 3.0 `nullable: true`.
+  - Rich constraint parsing and generation for numeric boundaries, string patterns, formats, and array boundaries.
+  - Format aliases: `oas`, `oas3`, `openapi3`, `openapi-3.1`, `openapi3.1`.
+  - Compound extension detection: `.openapi.json`, `.oas.json`, `openapi.json`, `.openapi`.
+- **Comprehensive Conversion Matrix & Integration Suite**:
+  - Complete 6-way conversion matrix tests across TypeScript, JSON Schema, Zod, and OpenAPI 3.1.
+  - Performance benchmarks covering small, medium, and large (750+ properties) schemas with sub-50ms conversion times and zero quadratic scaling.
+  - Character-level determinism validation across repeated runs.
+- **Enhanced CLI & Loss Policy Enforcement**:
+  - Strict exit codes: exit code `2` on `--loss-policy error` when loss is detected; exit code `0` on zero-loss conversions.
+  - Clear, actionable guidance when unsupported YAML files (`.yaml`, `.yml`) are provided to CLI or parser.
+  - Content-based auto-detection of OpenAPI 3 documents from generic JSON files.
+- **Contributor Experience & Community**:
+  - 4 genuine roadmap GitHub issues created for community contributions.
+  - GitHub Discussions enabled for feature discussions and showcase.
+  - Updated issue templates and pull request templates with structured checklists.
+
+### Fixed
+- **TypeScript Parser**: Corrected parsing of `null` in union types where `ts.LiteralTypeNode` was previously skipped, now correctly flagging `nullable: true` in SchemaIR.
+- **TypeScript Generator**: Removed redundant parentheses around primitive nullables (e.g. `(string) | null` now emits `string | null`).
+- **Zod Parser**: Fixed dropping of identifier schema references (e.g. `category: Category` and `address: AddressSchema.optional()`) in `z.object` declarations.
+
+### Changed
+- Expanded CI test matrix to test Node.js 24.x alongside 20.x and 22.x across Linux, Windows, and macOS.
+- Overhauled README, architecture guides, adding-a-format tutorial, and API reference documentation.
+
 ## [0.1.3] - 2026-10-08
 
 ### Fixed
