@@ -123,7 +123,7 @@ We are excited to announce `v0.2.0` of **typeshift**, an open-source schema comp
 
 #### Key Highlights:
 - **OpenAPI 3.1 Format Adapter**: Bidirectional compilation of OpenAPI 3.1 component schemas (`components.schemas`), reference resolution (`#/components/schemas/<Name>`), `readOnly` attributes, and constraint mappings.
-- **Verified Compiler Matrix**: 12 bidirectional conversion paths across TypeScript, JSON Schema, Zod, and OpenAPI, backed by automated integration tests and benchmark assertions to prevent quadratic scaling regressions.
+- **Verified Compiler Matrix**: 12 bidirectional conversion paths across TypeScript, JSON Schema, Zod, and OpenAPI, backed by automated integration tests covering the full conversion matrix with timing assertions on representative schema sizes.
 - **Strict Loss Policies**: Verified exit codes (`2` on unauthorized information loss) for automated CI quality gates.
 - **Flexible CLI Execution**: Full shell-pipe support (`echo ... | typeshift convert --from ts --to json-schema`) and compound extension auto-detection (`.openapi.json`, `.zod.ts`).
 - **Proven Supply Chain**: Published on npm with SLSA v1 cryptographic build provenance attestations.
@@ -159,7 +159,7 @@ Maintaining these across format boundaries introduces two challenges:
 2. Mismatched format expressiveness: Different schema languages have fundamentally different capabilities. For example, a JSON Schema with numeric boundaries (minimum: 18) or regex patterns cannot fully express those validation constraints in standard compile-time TypeScript interfaces. Without explicit diagnostics, developers may not notice which constraints were dropped during translation.
 
 How typeshift works:
-Instead of direct AST-to-AST translation, typeshift uses an intermediate representation (SchemaIR). Each format adapter implements two operations: parsing its syntax into SchemaIR, and generating its syntax from SchemaIR (2N adapters).
+Instead of direct AST-to-AST translation, typeshift uses an intermediate representation (SchemaIR). Each format adapter implements two operations: parsing its syntax into SchemaIR, and generating its syntax from SchemaIR (2N parser/generator operations).
 
 Each adapter declares its target capabilities (e.g., TypeScript declares that static interfaces do not enforce runtime regex or numeric bounds). A loss detection engine compares source constraints against target capabilities and surfaces exact dot-paths of dropped rules. In CI, running with `--loss-policy error` aborts conversion with exit code 2 if unrepresentable schema changes are introduced.
 
