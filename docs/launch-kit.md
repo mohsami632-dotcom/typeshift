@@ -11,13 +11,13 @@ This document contains ready-to-use launch materials, demonstration scripts, cop
 **typeshift** is an open-source schema compiler for bidirectional, loss-aware conversion across schema definition formats: TypeScript, JSON Schema, Zod, and OpenAPI 3.1.
 
 ### The Problem It Solves
-Modern web and backend systems maintain schemas across multiple layers: TypeScript compile-time interfaces, JSON Schema API contracts, Zod runtime validators, and OpenAPI specifications. Managing multiple point-to-point converters scales quadratically ($N \times (N-1)$). More critically, converting between formats with fundamentally mismatched expressiveness (such as runtime validation bounds vs. compile-time static types) can easily cause validation constraints to be lost without explicit warning.
+When managing schemas across multiple representations (TypeScript compile-time interfaces, JSON Schema API contracts, Zod runtime validators, and OpenAPI specifications), developers face two practical challenges: configuring separate point-to-point conversion paths between each format pair ($N \times (N-1)$ scaling), and managing constraint compatibility when converting between languages with different expressiveness (such as runtime validation bounds in JSON Schema vs. compile-time static types in TypeScript).
 
 ### Why typeshift is Different
 - **Canonical Compiler Model ($2N$)**: All formats parse into and generate from a shared Intermediate Representation (`SchemaIR`). Adding a format requires implementing only 2 functions: `parse()` and `generate()`.
 - **Explicit Information-Loss Diagnostics**: Compares source constraints against target format capabilities and surfaces exact dot-paths of unrepresentable rules (e.g. dropped regex patterns or numeric boundaries).
 - **CI Quality Enforcement**: `--loss-policy error` immediately fails automated pipelines (exit code `2`) if unauthorized loss occurs.
-- **Deterministic Output**: Alphabetically sorted keys and normalized formatting guarantee character-identical output and zero non-semantic git diff churn.
+- **Deterministic Output**: Alphabetically sorted keys and normalized formatting provide deterministic code generation to help reduce non-semantic git diff churn.
 - **Focused Dependency Architecture**: Directly leverages the official TypeScript Compiler API (`typescript`) for AST parsing and `commander` for CLI execution, keeping the intermediate representation and transformation engine self-contained.
 
 ---
@@ -123,9 +123,9 @@ We are excited to announce `v0.2.0` of **typeshift**, an open-source schema comp
 
 #### Key Highlights:
 - **OpenAPI 3.1 Format Adapter**: Bidirectional compilation of OpenAPI 3.1 component schemas (`components.schemas`), reference resolution (`#/components/schemas/<Name>`), `readOnly` attributes, and constraint mappings.
-- **Verified Compiler Matrix**: 12 bidirectional conversion paths across TypeScript, JSON Schema, Zod, and OpenAPI with sub-50ms execution times on schemas with hundreds of properties.
+- **Verified Compiler Matrix**: 12 bidirectional conversion paths across TypeScript, JSON Schema, Zod, and OpenAPI, backed by automated integration tests and benchmark assertions to prevent quadratic scaling regressions.
 - **Strict Loss Policies**: Verified exit codes (`2` on unauthorized information loss) for automated CI quality gates.
-- **Zero-Assumption CLI**: Full shell-pipe support (`echo ... | typeshift convert --from ts --to json-schema`) and compound extension auto-detection (`.openapi.json`, `.zod.ts`).
+- **Flexible CLI Execution**: Full shell-pipe support (`echo ... | typeshift convert --from ts --to json-schema`) and compound extension auto-detection (`.openapi.json`, `.zod.ts`).
 - **Proven Supply Chain**: Published on npm with SLSA v1 cryptographic build provenance attestations.
 
 Run instantly with npx:
@@ -155,8 +155,8 @@ The problem:
 Modern web and backend projects frequently maintain schemas across multiple representations: TypeScript interfaces for application types, Zod schemas for runtime boundary parsing, JSON Schema for contracts and events, and OpenAPI for public documentation.
 
 Maintaining these across format boundaries introduces two challenges:
-1. Combinatorial translation maintenance: Supporting N formats with point-to-point converters requires managing N*(N-1) translation paths with differing configuration and syntax handling.
-2. Inherent format mismatches: Different schema languages have fundamentally different expressiveness. A JSON Schema with numeric boundaries (minimum: 18) or regex patterns cannot fully express those validation constraints in standard compile-time TypeScript interfaces. Without explicit visibility, it is easy to assume target schemas carry the same guarantees as source schemas.
+1. Combinatorial translation maintenance: Supporting N formats with bespoke point-to-point tools requires managing N*(N-1) translation paths with different CLI conventions and configurations.
+2. Mismatched format expressiveness: Different schema languages have fundamentally different capabilities. For example, a JSON Schema with numeric boundaries (minimum: 18) or regex patterns cannot fully express those validation constraints in standard compile-time TypeScript interfaces. Without explicit diagnostics, developers may not notice which constraints were dropped during translation.
 
 How typeshift works:
 Instead of direct AST-to-AST translation, typeshift uses an intermediate representation (SchemaIR). Each format adapter implements two operations: parsing its syntax into SchemaIR, and generating its syntax from SchemaIR (2N adapters).
@@ -165,24 +165,34 @@ Each adapter declares its target capabilities (e.g., TypeScript declares that st
 
 Under the hood, typeshift integrates directly with the official TypeScript Compiler API for AST parsing and uses Commander for the CLI.
 
-Try it in your terminal without installing:
+Try it in your terminal with zero files required:
   echo 'export interface User { id: string; name: string; age?: number; }' | npx @mohsami/typeshift convert --from ts --to json-schema
 
-Or compile a JSON Schema with validation bounds into TypeScript:
-  npx @mohsami/typeshift convert schema.json --to typescript -o models.ts
+See how it surfaces dropped constraints when converting a rich schema to TypeScript:
+  echo '{"$schema":"http://json-schema.org/draft-07/schema#","title":"Product","type":"object","properties":{"sku":{"type":"string","pattern":"^[A-Z]{3}-\\d{4}$"},"price":{"type":"number","minimum":0}},"required":["sku","price"]}' | npx @mohsami/typeshift convert --from json-schema --to typescript
 
-Output:
+Output on stderr:
   Information-Loss Diagnostics (2 warnings):
-    ! WARNING [Product.sku] Constraint "pattern" will be dropped. (pattern constraint)
-    ! WARNING [Product.price] Constraint "minimum" will be dropped. (minimum constraint)
-  √ Successfully converted json-schema → typescript (models.ts)
+    ! WARNING [Product.sku] Constraint "pattern" (value: "^[A-Z]{3}-\\d{4}$") will be dropped. (pattern constraint)
+    ! WARNING [Product.price] Constraint "minimum" (value: 0) will be dropped. (minimum constraint)
+
+Output on stdout:
+  // Generated by typeshift — do not edit manually.
+
+  export interface Product {
+    sku: string;
+    price: number;
+  }
+
+You can append `--loss-policy error` to turn these warnings into a build failure (exit code 2) in CI:
+  echo '{"$schema":"http://json-schema.org/draft-07/schema#","title":"Product","type":"object","properties":{"sku":{"type":"string","pattern":"^[A-Z]{3}-\\d{4}$"},"price":{"type":"number","minimum":0}},"required":["sku","price"]}' | npx @mohsami/typeshift convert --from json-schema --to typescript --loss-policy error
 
 Current scope:
 - Supported: TypeScript interfaces & type aliases, JSON Schema (Draft-07), Zod schemas, and OpenAPI 3.1 component schemas (under components.schemas).
 - Not in scope: HTTP API routes under paths are not compiled (typeshift is a schema model compiler, not an RPC/REST client generator).
 - OpenAPI input: Currently requires JSON format (.openapi.json or .json). Direct YAML parsing is tracked on our roadmap (issue #5).
 
-Published on npm with SLSA v1 provenance (@mohsami/typeshift). The repository contains 5 verified end-to-end examples in the examples/ directory.
+Published on npm with SLSA v1 provenance (@mohsami/typeshift). The repository contains 5 committed, runnable examples in the examples/ directory.
 
 Repository: https://github.com/mohsami632-dotcom/typeshift
 npm: https://www.npmjs.com/package/@mohsami/typeshift
@@ -229,20 +239,35 @@ Formats have different expressiveness:
 `typeshift` includes an explicit **loss detection engine**. Each format adapter declares a capability manifest. When converting from a richer format to a less expressive one, it highlights the exact constraints that cannot be natively represented in the target format:
 
 ```bash
-npx @mohsami/typeshift convert schema.json --to typescript -o models.ts
+echo '{"$schema":"http://json-schema.org/draft-07/schema#","title":"Account","type":"object","properties":{"username":{"type":"string","pattern":"^[a-z0-9_-]{3,16}$"},"age":{"type":"number","minimum":13}},"required":["username","age"]}' | npx @mohsami/typeshift convert --from json-schema --to typescript
 ```
 
+Diagnostics emitted to `stderr`:
 ```text
 Information-Loss Diagnostics (2 warnings):
-  ! WARNING [Account.username] Constraint "pattern" (value: "^[a-z0-9_-]{3,16}$") will be dropped.
-  ! WARNING [Account.age] Constraint "minimum" (value: 13) will be dropped.
-√ Successfully converted json-schema → typescript (models.ts)
+  ! WARNING [Account.username] Constraint "pattern" (value: "^[a-z0-9_-]{3,16}$") will be dropped. (pattern constraint)
+  ! WARNING [Account.age] Constraint "minimum" (value: 13) will be dropped. (minimum constraint)
+```
+
+Generated TypeScript emitted to `stdout`:
+```typescript
+// Generated by typeshift — do not edit manually.
+
+export interface Account {
+  username: string;
+  age: number;
+}
 ```
 
 In CI pipelines, you can run with `--loss-policy error` to reject conversions that drop validation rules:
 ```bash
-typeshift convert schema.json --to typescript -o models.ts --loss-policy error
+echo '{"$schema":"http://json-schema.org/draft-07/schema#","title":"Account","type":"object","properties":{"username":{"type":"string","pattern":"^[a-z0-9_-]{3,16}$"},"age":{"type":"number","minimum":13}},"required":["username","age"]}' | npx @mohsami/typeshift convert --from json-schema --to typescript --loss-policy error
 # Exits with status code 2 on detected loss
+```
+
+Or convert the committed example file directly:
+```bash
+npx @mohsami/typeshift convert examples/03-json-schema-to-typescript/account.json --to typescript
 ```
 
 ### Quick Test Drive via Pipe
@@ -298,7 +323,7 @@ When engaging with developers on Hacker News, Reddit, and GitHub Discussions, us
 > **Answer:**  
 > Those are reliable, high-quality tools for their specific point-to-point jobs! However:
 > 1. Using single-purpose packages leads to an $N \times (N-1)$ matrix of dependencies, each with different CLI flags, different JSON Schema draft interpretations, and different issue trackers.
-> 2. When you convert in reverse (e.g. JSON Schema back to TypeScript), point-to-point tools often face format capability mismatches without explicit warnings. `typeshift` unifies these transformations under a canonical intermediate representation (`SchemaIR`) and explicitly reports information loss.
+> 2. Single-purpose converters naturally focus on their specific source-to-target mapping. `typeshift` is built around a centralized Intermediate Representation (`SchemaIR`) paired with an explicit capability matrix. This allows `typeshift` to systematically detect and report constraint drops across any pair of formats, with configurable exit codes (`--loss-policy error`) for CI enforcement.
 
 ### Q3: "Why don't you support OpenAPI `paths` (endpoints, route parameters, HTTP methods)?"
 > **Answer:**  
