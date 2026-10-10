@@ -31,7 +31,7 @@ Instead of building separate converters between each pair of formats, typeshift 
    [Your notes: e.g., "I had a backend service in Node with JSON Schemas and a frontend in React with TypeScript interfaces, and every time someone updated a field, something silently drifted..."]
 
 2. What tool did you try first, and why didn't it fully solve your problem?
-   [Your notes: e.g., "Existing tools only went one direction (A -> B), or required 5 different CLI tools with different options, and none of them warned me when validation bounds like minimum: 0 disappeared in TypeScript..."]
+   [Your notes: e.g., "I used individual point-to-point tools for specific format pairs, but managing separate CLIs across multiple schemas was tedious, and static TypeScript interfaces couldn't capture the validation rules defined in my JSON Schemas..."]
 
 3. What part of building typeshift did you find most interesting or challenging?
    [Your notes: e.g., "Designing the intermediate AST (SchemaIR) so that adding a format only requires a parser and a generator, rather than wiring up 12 different translation paths..."]
@@ -52,7 +52,7 @@ Modern web and backend applications rarely use just one schema representation:
 
 ### The Two Underlying Hard Problems:
 1. **Combinatorial Complexity**: With $N$ formats, maintaining point-to-point converters requires $N \times (N-1)$ translation paths (12 paths for 4 formats; 30 paths for 6 formats), each with different CLI flags and idiosyncrasies.
-2. **Mismatched Format Expressiveness**: Different formats have fundamentally different capabilities. A JSON Schema or Zod validator can enforce `minimum: 18`, `pattern: "^[A-Z]{3}$"`, or `format: "email"`. A compile-time TypeScript interface cannot enforce runtime numeric bounds or regexes. Many existing converters silently ignore or drop these constraints without telling you.
+2. **Mismatched Format Expressiveness**: Different schema formats have fundamentally different capabilities. A JSON Schema or Zod validator can enforce runtime validation rules such as numeric boundaries (`minimum: 18`), regex patterns (`pattern: "^[A-Z]{3}$"`), or format hints (`format: "email"`). A compile-time TypeScript interface cannot enforce runtime numeric bounds or regexes without supplementary runtime validation code. Because standard interfaces cannot express these constraints, translating schemas across format boundaries can result in unrepresentable rules being omitted from the target output. typeshift addresses this by declaring explicit capability manifests for each format adapter and running a dedicated loss detection engine that surfaces the exact dot-paths and dropped constraints on `stderr`, with `--loss-policy error` available to fail CI builds when loss occurs.
 
 ---
 
@@ -133,7 +133,7 @@ Use this structural outline to write your post in your own voice:
 2. **Opening (1–2 sentences)**:
    State what you made and link to the repo: `Hi HN, I built typeshift (https://github.com/mohsami632-dotcom/typeshift), an open-source schema compiler for TypeScript, JSON Schema, Zod, and OpenAPI 3.1.`
 3. **The Personal Problem / Motivation (1 paragraph)**:
-   In your own words, explain the friction of managing data schemas across multiple layers (compile-time TS vs runtime Zod vs contract JSON Schema) and how dropped validation constraints led you to build this.
+   In your own words, explain the friction of managing data schemas across multiple layers (compile-time TS vs runtime Zod vs contract JSON Schema) and how tracking validation constraints across different format capabilities led you to build this.
 4. **How It Works Technically (2 paragraphs)**:
    - Mention the canonical compiler model (`SchemaIR` intermediate representation).
    - Explain how capability manifests detect when constraints (regex, min/max) cannot be expressed in the target format.
@@ -151,7 +151,7 @@ Use this structural outline to write your post in your own voice:
 
 ### "How does this compare to `quicktype`?"
 - **Factual Difference**: `quicktype` focuses on one-way generation of client models in 20+ programming languages (Go, C#, Swift, Rust) from JSON samples or JSON Schema.
-- `typeshift` focuses specifically on bidirectional conversion between the core schema formats used in TypeScript/JavaScript stacks (TS, Zod, JSON Schema, OpenAPI), with a formal capability matrix and explicit loss diagnostics to catch silent constraint degradation.
+- `typeshift` focuses specifically on bidirectional conversion between the core schema formats used in TypeScript/JavaScript stacks (TS, Zod, JSON Schema, OpenAPI), with a formal capability matrix and explicit loss diagnostics to report unrepresentable constraints when converting to less expressive formats.
 
 ### "How does this compare to `zod-to-json-schema` or `json-schema-to-typescript`?"
 - **Factual Difference**: Those are excellent single-purpose tools for specific format pairs. However, combining them requires maintaining multiple packages with different configurations and AST interpretations.

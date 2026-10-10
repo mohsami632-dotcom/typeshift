@@ -117,14 +117,14 @@ async function collectMetrics() {
           available: npmWeekRes.available,
           period: npmWeekRes.available ? `${npmWeekRes.data.start} to ${npmWeekRes.data.end}` : null,
           source: 'https://api.npmjs.org/downloads/point/last-week',
-          measures: 'Total npm download requests over previous 7 days (includes automated CI/bot installs)',
+          measures: 'Total npm download requests over previous 7 days (activity count, not unique users)',
         },
         downloadsLastMonth: {
           value: npmMonthRes.available ? npmMonthRes.data.downloads : null,
           available: npmMonthRes.available,
           period: npmMonthRes.available ? `${npmMonthRes.data.start} to ${npmMonthRes.data.end}` : null,
           source: 'https://api.npmjs.org/downloads/point/last-month',
-          measures: 'Total npm download requests over previous 30 days (includes automated CI/bot installs)',
+          measures: 'Total npm download requests over previous 30 days (activity count, not unique users)',
         },
       },
       github: {
@@ -170,7 +170,7 @@ async function collectMetrics() {
           uniques: ghClonesRes.available ? ghClonesRes.data.uniques : null,
           available: ghClonesRes.available,
           source: 'GitHub Traffic API (/traffic/clones)',
-          measures: 'Git clone operations over rolling 14 days',
+          measures: 'Total Git clone operations over rolling 14 days (activity count, not unique users)',
         },
       },
     },
@@ -254,9 +254,9 @@ function printReportTable(snapshot, snapshotFile) {
   console.log('\x1b[1m└────────────────────────────────────────┴─────────────────────┴──────────────────────────┘\x1b[0m\n');
 
   console.log('\x1b[1m\x1b[33mHonest Metrics Interpretation Notes:\x1b[0m');
-  console.log('• \x1b[1mnpm Downloads != Active Users\x1b[0m: npm download counts include automated CI runners, Dependabot, and build mirrors.');
-  console.log('• \x1b[1mGitHub Stars != Adoption\x1b[0m: Stars reflect casual curiosity or bookmarks. Real adoption is measured by issues, PRs, and users.');
-  console.log('• \x1b[1mTraffic metrics\x1b[0m: Cover the last 14 days and require maintainer authentication.');
+  console.log('• \x1b[1mActivity counts != Unique users\x1b[0m: npm download counts and GitHub clones represent total activity events, not unique users or active adoption.');
+  console.log('• \x1b[1mGitHub Stars != Adoption\x1b[0m: Stars reflect interest or bookmarks. Real adoption is measured by real user schemas, feedback, issues, and PRs.');
+  console.log('• \x1b[1mTraffic metrics\x1b[0m: Cover the last 14 days and require repository push access.');
   console.log(`\nSnapshot saved: \x1b[32m${snapshotFile}\x1b[0m`);
   console.log(`History CSV updated: \x1b[32m${CSV_PATH}\x1b[0m\n`);
 }

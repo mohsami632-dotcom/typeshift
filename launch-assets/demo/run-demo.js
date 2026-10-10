@@ -52,10 +52,10 @@ function getCliRunner() {
   const distCli = resolve(REPO_ROOT, 'dist/cli.js');
   // Check if pnpm is available
   try {
-    const pnpmCheck = spawnSync('pnpm', ['--version'], { encoding: 'utf8', shell: true });
+    const pnpmCheck = spawnSync('pnpm --version', { encoding: 'utf8', shell: true });
     if (pnpmCheck.status === 0) {
       return {
-        display: 'npx @mohsami/typeshift@0.2.0',
+        display: 'pnpm dlx @mohsami/typeshift@0.2.0',
         exec: 'pnpm',
         args: ['dlx', '@mohsami/typeshift@0.2.0'],
       };
@@ -66,14 +66,14 @@ function getCliRunner() {
 
   if (existsSync(distCli)) {
     return {
-      display: 'npx @mohsami/typeshift@0.2.0',
+      display: 'node dist/cli.js',
       exec: process.execPath,
       args: [distCli],
     };
   }
 
   return {
-    display: 'npx @mohsami/typeshift@0.2.0',
+    display: 'npx --yes @mohsami/typeshift@0.2.0',
     exec: 'npx',
     args: ['--yes', '@mohsami/typeshift@0.2.0'],
   };

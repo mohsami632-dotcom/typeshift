@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-10T10:12:44.542Z",
+  "timestamp": "2026-10-10T10:34:32.201Z",
   "date": "2026-10-10",
   "package": "@mohsami/typeshift",
   "repository": "mohsami632-dotcom/typeshift",
@@ -10,14 +10,14 @@
         "available": true,
         "period": "2026-10-02 to 2026-10-08",
         "source": "https://api.npmjs.org/downloads/point/last-week",
-        "measures": "Total npm download requests over previous 7 days (includes automated CI/bot installs)"
+        "measures": "Total npm download requests over previous 7 days (activity count, not unique users)"
       },
       "downloadsLastMonth": {
         "value": 495,
         "available": true,
         "period": "2026-09-09 to 2026-10-08",
         "source": "https://api.npmjs.org/downloads/point/last-month",
-        "measures": "Total npm download requests over previous 30 days (includes automated CI/bot installs)"
+        "measures": "Total npm download requests over previous 30 days (activity count, not unique users)"
       }
     },
     "github": {
@@ -63,7 +63,7 @@
         "uniques": 81,
         "available": true,
         "source": "GitHub Traffic API (/traffic/clones)",
-        "measures": "Git clone operations over rolling 14 days"
+        "measures": "Total Git clone operations over rolling 14 days (activity count, not unique users)"
       }
     }
   }
