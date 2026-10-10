@@ -10,6 +10,12 @@ coverage/
 # Package tarballs
 *.tgz
 
+# Large media files
+launch-assets/media/*.mp4
+launch-assets/media/*.webm
+launch-assets/media/*.mov
+launch-assets/media/*.avi
+
 # OS files
 .DS_Store
 Thumbs.db

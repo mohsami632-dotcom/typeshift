@@ -1,0 +1,70 @@
+{
+  "timestamp": "2026-10-10T10:12:44.542Z",
+  "date": "2026-10-10",
+  "package": "@mohsami/typeshift",
+  "repository": "mohsami632-dotcom/typeshift",
+  "metrics": {
+    "npm": {
+      "downloadsLastWeek": {
+        "value": 495,
+        "available": true,
+        "period": "2026-10-02 to 2026-10-08",
+        "source": "https://api.npmjs.org/downloads/point/last-week",
+        "measures": "Total npm download requests over previous 7 days (includes automated CI/bot installs)"
+      },
+      "downloadsLastMonth": {
+        "value": 495,
+        "available": true,
+        "period": "2026-09-09 to 2026-10-08",
+        "source": "https://api.npmjs.org/downloads/point/last-month",
+        "measures": "Total npm download requests over previous 30 days (includes automated CI/bot installs)"
+      }
+    },
+    "github": {
+      "stars": {
+        "value": 1,
+        "available": true,
+        "source": "GitHub Repository API",
+        "measures": "Total GitHub user stars/bookmarks"
+      },
+      "forks": {
+        "value": 0,
+        "available": true,
+        "source": "GitHub Repository API",
+        "measures": "Total repository forks"
+      },
+      "openIssues": {
+        "value": 5,
+        "available": true,
+        "source": "GitHub Repository API (open_issues minus open_pulls)",
+        "measures": "Genuine open issue tickets"
+      },
+      "openPullRequests": {
+        "value": 0,
+        "available": true,
+        "source": "GitHub Pull Requests API",
+        "measures": "Open community pull requests"
+      },
+      "latestReleaseTag": {
+        "value": "v0.2.0",
+        "available": true,
+        "source": "GitHub Releases API",
+        "measures": "Most recent published GitHub release tag"
+      },
+      "trafficViews14d": {
+        "value": 8,
+        "uniques": 1,
+        "available": true,
+        "source": "GitHub Traffic API (/traffic/views)",
+        "measures": "Repository page views over rolling 14 days"
+      },
+      "trafficClones14d": {
+        "value": 290,
+        "uniques": 81,
+        "available": true,
+        "source": "GitHub Traffic API (/traffic/clones)",
+        "measures": "Git clone operations over rolling 14 days"
+      }
+    }
+  }
+}
